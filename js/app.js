@@ -39,15 +39,19 @@ function loadState() {
     if (!raw) return createDefaultState();
     const parsed = JSON.parse(raw);
     const base = createDefaultState();
+    const validScreens = ["home", "players", "round", "scores", "results"];
     return {
       ...base,
       ...parsed,
+      screen: validScreens.includes(parsed.screen) ? parsed.screen : "home",
       level: parsed.level === 1 ? 1 : 2,
       playerCount: [2, 3, 4].includes(parsed.playerCount) ? parsed.playerCount : 3,
       playerNames: Array.isArray(parsed.playerNames)
         ? [0, 1, 2, 3].map((i) => String(parsed.playerNames[i] ?? ""))
         : base.playerNames,
       round: Math.min(TOTAL_ROUNDS, Math.max(1, Number(parsed.round) || 1)),
+      eventDrawn: Boolean(parsed.eventDrawn),
+      currentEventId: parsed.currentEventId ?? null,
       drawnEventIds: Array.isArray(parsed.drawnEventIds) ? parsed.drawnEventIds : [],
       scores: Array.isArray(parsed.scores)
         ? [0, 1, 2, 3].map((i) => ({
@@ -62,21 +66,26 @@ function loadState() {
 }
 
 // Persist current state to localStorage
-function saveState(state) {
+function saveState(nextState) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
   } catch {
     // Ignore storage quota errors in restricted browsing modes
   }
 }
 
-// Clear persisted game state
+// Clear persisted game state only when explicitly requested
 function clearSavedState() {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
     // Ignore storage errors
   }
+}
+
+// Check if a game is currently in progress (beyond home screen)
+function hasActiveGame(currentState) {
+  return currentState.screen !== "home";
 }
 
 // Application state instance
@@ -132,7 +141,7 @@ function applyLevelBadge(badgeEl, level) {
   badgeEl.classList.toggle("is-level-2", level === 2);
 }
 
-// Show only the target screen and save state
+// Show only the target screen and save state without wiping game progress
 function showScreen(screenName) {
   state.screen = screenName;
   saveState(state);
@@ -142,7 +151,7 @@ function showScreen(screenName) {
   renderCurrentScreen();
 }
 
-// Render home level selection cards
+// Render home level selection cards and primary CTA label
 function renderHome() {
   els.levelCards.forEach((card) => {
     const lvl = Number(card.dataset.level);
@@ -150,6 +159,10 @@ function renderHome() {
     card.classList.toggle("is-selected", selected);
     card.setAttribute("aria-pressed", String(selected));
   });
+
+  if (els.btnNewGame) {
+    els.btnNewGame.textContent = hasActiveGame(state) ? "Resume game" : "New game";
+  }
 }
 
 // Render player setup inputs based on playerCount
@@ -233,6 +246,7 @@ function renderRound() {
     els.btnRoundAction.textContent = `Round ${state.round}: draw event`;
   } else {
     const ev = EVENTS.find((item) => item.id === state.currentEventId) || EVENTS[0];
+    const evTitle = ev.title || ev.name;
     const floor = FUNNEL_FLOORS[ev.floor] || { label: ev.floor };
     els.eventSlot.innerHTML = `
       <div class="event-card-box">
@@ -241,7 +255,7 @@ function renderRound() {
           <span class="event-excl">!</span>
         </div>
         <div class="event-card-body">
-          <h2 class="event-title">${ev.title}</h2>
+          <h2 class="event-title">${evTitle}</h2>
           <p class="event-effect">${ev.effect}</p>
           <p class="event-footer-tip">Apply this effect during Round ${state.round}, then advance when everyone has played.</p>
         </div>
@@ -392,8 +406,13 @@ function renderResults() {
     .join("");
 }
 
-// Dispatch rendering for active screen
+// Dispatch rendering for active screen and keep hidden state synchronized
 function renderCurrentScreen() {
+  Object.entries(els.screens).forEach(([key, section]) => {
+    if (section) {
+      section.classList.toggle("hidden", key !== state.screen);
+    }
+  });
   renderHome();
   if (state.screen === "players") renderPlayers();
   if (state.screen === "round") renderRound();
@@ -419,7 +438,7 @@ function closeModal(modalEl) {
   pendingModalAction = null;
 }
 
-// Level selection handlers on home screen
+// Level selection handlers on home screen (updates level without erasing active game)
 els.levelCards.forEach((card) => {
   card.addEventListener("click", () => {
     state.level = Number(card.dataset.level) === 1 ? 1 : 2;
@@ -428,8 +447,12 @@ els.levelCards.forEach((card) => {
   });
 });
 
-// Start new game setup from home screen
+// Resume active game or start fresh player setup without losing saved game if resuming
 els.btnNewGame.addEventListener("click", () => {
+  if (hasActiveGame(state)) {
+    showScreen(state.screen);
+    return;
+  }
   const cfg = LEVEL_CONFIG[state.level];
   state.scores = [0, 1, 2, 3].map(() => ({
     market: "",
@@ -558,5 +581,5 @@ els.modalResetConfirm.addEventListener("click", () => {
   if (typeof fn === "function") fn();
 });
 
-// Initial render on load
+// Initial render on load (automatically opens saved screen if a game is active)
 renderCurrentScreen();
