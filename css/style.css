@@ -84,7 +84,7 @@ button {
 
 /* Logo image size inside inner headers */
 .brand-logo-only img {
-  height: 100px; /* Default header logo height */
+  height: 80px; /* Default header logo height */
   width: auto; /* Keep natural aspect ratio */
   display: block; /* Prevent inline baseline gap */
 }
