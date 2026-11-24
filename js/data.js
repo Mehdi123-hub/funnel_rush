@@ -4,34 +4,45 @@ export const TOTAL_ROUNDS = 6;
 // Total prospect tokens each player starts with (Market + Funnel = 30)
 export const TOTAL_TOKENS = 30;
 
-// Player token colors assigned in player order (2 to 4 players)
+// Level configuration used by app.js
+export const LEVEL_CONFIG = {
+  1: { label: "Level 1", startingCoins: 20, hasMissions: false },
+  2: { label: "Level 2", startingCoins: 15, hasMissions: true },
+};
+
+// Player token colors with name and hex for app.js
 export const PLAYER_COLORS = [
-  "#00b386", // Player 1 token color (teal/green)
-  "#ec4899", // Player 2 token color (pink)
-  "#f97316", // Player 3 token color (orange)
-  "#3b82f6"  // Player 4 token color (blue)
+  { name: "Teal", hex: "#00b386" },
+  { name: "Pink", hex: "#ec4899" },
+  { name: "Orange", hex: "#f97316" },
+  { name: "Blue", hex: "#3b82f6" },
 ];
 
 // The 5 marketing funnel stages with their display names and colors
 export const FLOORS = [
-  { id: "awareness",     name: "Awareness",     color: "#CDEFF3" }, // Stage 1: top of funnel
-  { id: "interest",      name: "Interest",      color: "#8FDCE5" }, // Stage 2: engagement
-  { id: "consideration", name: "Consideration", color: "#3FBCCB" }, // Stage 3: evaluation
-  { id: "conversion",    name: "Conversion",    color: "#1A8291" }, // Stage 4: purchase
-  { id: "loyalty",       name: "Loyalty",       color: "#0E4F58" }  // Stage 5: retention
+  { id: "awareness",     name: "Awareness",     color: "#CDEFF3" },
+  { id: "interest",      name: "Interest",      color: "#8FDCE5" },
+  { id: "consideration", name: "Consideration", color: "#3FBCCB" },
+  { id: "conversion",    name: "Conversion",    color: "#1A8291" },
+  { id: "loyalty",       name: "Loyalty",       color: "#0E4F58" },
 ];
+
+// Map alias used by app.js for event badges
+export const FUNNEL_FLOORS = Object.fromEntries(
+  FLOORS.map((f) => [f.id, { label: f.name, color: f.color }])
+);
 
 // Action cards available in Level 1 (12 cards) and Level 2 (3 additional cards = 15 total)
 export const CARDS = [
   {
-    id: "instagram-ad", // Unique slug used for card anchors
-    name: "Instagram Ad", // Card display name
-    floor: "awareness", // Funnel stage identifier
-    cost: 3, // Coin cost from the bank
-    level: 1, // Available starting at Level 1
-    effect: "Move 4 prospects from Market to Awareness.", // Exact mechanical effect
-    definition: "Paid advertising shown on Instagram to a chosen audience (age, interests, location). It reaches many people quickly.", // Marketing lever definition
-    example: "Sponsoring a Story aimed at 18–30-year-olds who love fitness to introduce your app." // Concrete example
+    id: "instagram-ad",
+    name: "Instagram Ad",
+    floor: "awareness",
+    cost: 3,
+    level: 1,
+    effect: "Move 4 prospects from Market to Awareness.",
+    definition: "Paid advertising shown on Instagram to a chosen audience (age, interests, location). It reaches many people quickly.",
+    example: "Sponsoring a Story aimed at 18–30-year-olds who love fitness to introduce your app."
   },
   {
     id: "seo-article",
@@ -178,63 +189,128 @@ export const CARDS = [
 // Round events: 6 for Level 1, plus 4 harder events unlocked in Level 2 (10 total)
 export const EVENTS = [
   {
-    id: "google-algorithm-update", // Unique event identifier
-    name: "Google Algorithm Update", // Event title
-    level: 1, // Available in Level 1 and Level 2
-    effect: "SEO Article cards add only 1 prospect this round." // Round effect
+    id: "google-algorithm-update",
+    title: "Google Algorithm Update",
+    name: "Google Algorithm Update",
+    floor: "awareness",
+    level: 1,
+    effect: "SEO Article cards add only 1 prospect this round."
   },
   {
     id: "bad-review",
+    title: "Bad Review",
     name: "Bad Review",
+    floor: "consideration",
     level: 1,
     effect: "Each player loses 2 prospects in Consideration. Customer Reviews protects you."
   },
   {
     id: "viral-post",
+    title: "Viral Post",
     name: "Viral Post",
+    floor: "awareness",
     level: 1,
     effect: "The player with the fewest prospects in Awareness adds 3."
   },
   {
     id: "competitor-launch",
+    title: "Competitor Launch",
     name: "Competitor Launch",
+    floor: "interest",
     level: 1,
     effect: "Each player loses 1 prospect on every stage that has 3 or more."
   },
   {
     id: "black-friday",
+    title: "Black Friday",
     name: "Black Friday",
+    floor: "conversion",
     level: 1,
     effect: "Free Trial, Promo Code, and A/B Test cost 1 coin less this round."
   },
   {
     id: "website-bug",
+    title: "Website Bug",
     name: "Website Bug",
+    floor: "conversion",
     level: 1,
     effect: "No one can play Free Trial, Promo Code, or A/B Test this round."
   },
   {
     id: "ad-price-hike",
+    title: "Ad Price Hike",
     name: "Ad Price Hike",
-    level: 2, // Level 2 event only
+    floor: "awareness",
+    level: 2,
     effect: "Instagram Ad and Influencer Partnership cost 2 coins more."
   },
   {
     id: "gdpr-audit",
+    title: "GDPR Audit",
     name: "GDPR Audit",
+    floor: "interest",
     level: 2,
     effect: "Each player pays 2 coins to the bank for compliance."
   },
   {
     id: "economic-downturn",
+    title: "Economic Downturn",
     name: "Economic Downturn",
+    floor: "conversion",
     level: 2,
     effect: "All revenues are divided by 2 (rounded down)."
   },
   {
     id: "churn-spike",
+    title: "Churn Spike",
     name: "Churn Spike",
+    floor: "loyalty",
     level: 2,
     effect: "The churn die makes a customer leave on a roll of 1, 2, or 3."
   }
 ];
+
+// Compute base score breakdown for a single player before conversion-rate bonus
+export function computePlayerScore(scoreInput, level = 2) {
+  const market = Math.max(0, Number(scoreInput?.market) || 0);
+  const interest = Math.max(0, Number(scoreInput?.interest) || 0);
+  const conversion = Math.max(0, Number(scoreInput?.conversion) || 0);
+  const coins = Math.max(0, Number(scoreInput?.coins) || 0);
+  const missionBonus = level === 2 && Boolean(scoreInput?.mission) ? 5 : 0;
+
+  const basePoints = interest * 2 + conversion * 4 + coins + missionBonus;
+  const totalEngaged = interest + conversion;
+  const conversionRate = totalEngaged > 0 ? conversion / totalEngaged : 0;
+
+  return {
+    market,
+    interest,
+    conversion,
+    coins,
+    missionBonus,
+    conversionRate,
+    hasConversionBonus: false,
+    basePoints,
+    totalPoints: basePoints,
+  };
+}
+
+// Award +3 bonus to highest conversion rate and sort players by final score
+export function rankPlayers(players) {
+  if (!Array.isArray(players) || players.length === 0) return [];
+  const maxRate = Math.max(...players.map((p) => p.conversionRate || 0));
+
+  const withBonus = players.map((p) => {
+    const earnedBonus = maxRate > 0 && Math.abs((p.conversionRate || 0) - maxRate) < 1e-9;
+    return {
+      ...p,
+      hasConversionBonus: earnedBonus,
+      totalPoints: p.basePoints + (earnedBonus ? 3 : 0),
+    };
+  });
+
+  return withBonus.sort((a, b) => {
+    if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+    return (b.conversionRate || 0) - (a.conversionRate || 0);
+  });
+}
