@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- Declare HTML5 document -->
+<html lang="en">
+<!-- Set document language to English -->
+<head>
+  <!-- UTF-8 encoding -->
+  <meta charset="utf-8">
+  <!-- Responsive mobile viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Theme color -->
+  <meta name="theme-color" content="#f4f2ff">
+  <!-- Page title -->
+  <title>Funnel Rush — Card Guide</title>
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Card guide module script -->
+  <script type="module" src="./js/guide.js"></script>
+</head>
+<body>
+  <!-- Centered mobile-first container -->
+  <main class="app-shell">
+    <!-- Top header with logo only and card count badge -->
+    <header class="top-bar">
+      <a href="./index.html" class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></a>
+      <span class="level-badge is-level-2">15 cards</span>
+    </header>
+
+    <!-- List view -->
+    <section id="guide-list-view">
+      <h1 class="screen-title">Card guide</h1>
+      <p class="screen-subtitle">All 15 cards, by stage · L2 = level 2</p>
+      <p class="guide-tap-hint">Tap a card to open it.</p>
+      <!-- Dynamic container for funnel floor groups and card rows -->
+      <div id="guide-groups"></div>
+    </section>
+
+    <!-- Single card detail view -->
+    <section id="guide-detail-view" class="hidden">
+      <!-- Back link to return to full list -->
+      <button id="btn-back-to-list" type="button" class="back-link-btn">&lsaquo; All cards</button>
+      <!-- Dynamic container for selected card details -->
+      <div id="guide-detail-content"></div>
+      <!-- Button cycling to the next card in the deck -->
+      <button id="btn-next-card" type="button" class="cta-btn is-outline">Next card</button>
+    </section>
+  </main>
+</body>
+</html>

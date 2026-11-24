@@ -1,1100 +1,199 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<!-- Declare HTML5 document -->
+<html lang="en">
+<!-- Set document language to English -->
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0E4F58" />
-  <meta name="description" content="Funnel Rush : compagnon de jeu marketing, tirage des événements et guide des cartes action." />
-  <title>Funnel Rush — Compagnon de jeu &amp; Guide des cartes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+  <!-- UTF-8 character encoding -->
+  <meta charset="utf-8">
+  <!-- Mobile viewport configuration including safe-area support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Browser theme color matching lavender background -->
+  <meta name="theme-color" content="#f4f2ff">
+  <!-- Page title -->
+  <title>Funnel Rush</title>
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Main application module script -->
+  <script type="module" src="./js/app.js"></script>
 </head>
 <body>
+  <!-- Centered mobile-first app container -->
+  <main class="app-shell">
+    <!-- 1. HOME SCREEN -->
+    <section id="screen-home" class="home-screen">
+      <div>
+        <!-- Brand logo (already includes Funnel Rush text) -->
+        <img class="hero-logo" src="./FunnelRush_Logo.png" alt="Funnel Rush">
+        <!-- Game tagline -->
+        <h1 class="hero-title">Turn strangers into loyal customers.</h1>
+        <!-- Format and player count note -->
+        <p class="hero-subtitle">A conversion funnel board game · 2 to 4 players</p>
 
-  <!-- BARRE DE NAVIGATION -->
-  <header class="top-nav">
-    <div class="top-nav-inner">
-      <a href="#appli" class="brand-logo" id="logo-link">
-        <span class="brand-icon">▼</span>
-        <span>Funnel Rush</span>
-      </a>
-      <nav class="nav-tabs" aria-label="Navigation principale">
-        <button type="button" class="nav-tab active" id="tab-appli">L'Appli (QR Appli)</button>
-        <button type="button" class="nav-tab" id="tab-guide">Guide des cartes (QR Guide)</button>
-      </nav>
-    </div>
-  </header>
+        <!-- Level selector prompt -->
+        <p class="level-picker-label">Choose level</p>
+        <!-- Two-option level radio group -->
+        <div class="level-grid" role="radiogroup" aria-label="Choose level">
+          <!-- Level 1 card -->
+          <button type="button" class="level-card" data-level="1" aria-pressed="false">
+            <div class="level-card-top">
+              <span class="level-num">1</span>
+              <span class="radio-dot"></span>
+            </div>
+            <div class="level-card-title">Level 1</div>
+            <p class="level-card-desc">Discovery · 20 coins</p>
+          </button>
 
-  <!-- ========================================================================
-       VUE 1 : L'APPLI (INSCRIPTION / MANCHES 1-8 / SAISIE FINALE / CLASSEMENT)
-       ======================================================================== -->
-  <main id="view-app" class="container">
-
-    <!-- ÉCRAN 1 : INSCRIPTION -->
-    <section id="screen-inscription" class="setup-wrapper hidden">
-      <div class="setup-hero">
-        <span class="badge">Serious Game Marketing • 8 Manches</span>
-        <h1>Nouvelle partie</h1>
-        <p>Inscrivez 2 à 4 équipes. L'appli gère les événements à chaque manche, puis calcule le classement à la fin.</p>
+          <!-- Level 2 card (selected by default) -->
+          <button type="button" class="level-card level-2-card is-selected" data-level="2" aria-pressed="true">
+            <div class="level-card-top">
+              <span class="level-num">2</span>
+              <span class="radio-dot"></span>
+            </div>
+            <div class="level-card-title">Level 2</div>
+            <p class="level-card-desc">Expert · 15 coins · secret missions</p>
+          </button>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="flow-pills">
-          <span class="flow-pill">1. Tirage d'événement (Manches 1 à 8)</span>
-          <span class="flow-pill">2. Saisie des pions &amp; pièces à la fin</span>
-          <span class="flow-pill">3. Classement automatique</span>
-        </div>
-
-        <div id="setup-error" class="error-banner hidden" role="alert"></div>
-
-        <form id="setup-form" novalidate>
-          <div id="player-inputs-list" class="player-input-list"></div>
-          <button type="submit" class="btn btn-primary btn-block">
-            Lancer la partie 🚀
-          </button>
-        </form>
+      <div>
+        <!-- Button advancing to player setup -->
+        <button id="btn-new-game" type="button" class="cta-btn">New game</button>
+        <!-- Bottom CARDS button opening the Card Guide -->
+        <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+        <!-- Helper note for QR re-entry -->
+        <p class="helper-note">Scan the board's APP QR code to return to your game.</p>
       </div>
     </section>
 
-    <!-- ÉCRAN 2 : MANCHES 1 À 8 (TIRAGE D'ÉVÉNEMENTS UNIQUEMENT) -->
-    <section id="screen-rounds" class="hidden">
-      <div class="round-banner">
-        <div class="round-top-row">
-          <div class="round-counter-wrap">
-            <span id="round-label" class="round-pill">Manche 1 / 8</span>
-            <div id="round-dots" class="round-dots" aria-hidden="true"></div>
-          </div>
+    <!-- 2. PLAYERS SCREEN -->
+    <section id="screen-players" class="hidden">
+      <!-- Top header with logo only and active level badge -->
+      <header class="top-bar">
+        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
+        <span id="players-level-badge" class="level-badge is-level-2">Level 2</span>
+      </header>
 
-          <button type="button" id="btn-draw-event" class="btn btn-draw-event">
-            ⚡ Tirer l'événement
-          </button>
-        </div>
+      <!-- Screen heading and prompt -->
+      <h1 class="screen-title">Players</h1>
+      <p class="screen-subtitle">How many players are at the table?</p>
 
-        <div id="event-area"></div>
+      <!-- Player count selector (2, 3, or 4) -->
+      <div class="count-switcher" role="group" aria-label="Number of players">
+        <button type="button" class="count-btn" data-count="2">2</button>
+        <button type="button" class="count-btn is-active" data-count="3">3</button>
+        <button type="button" class="count-btn" data-count="4">4</button>
       </div>
 
-      <div class="card">
-        <div class="section-title">
-          <span>👥 Équipes en jeu sur le plateau</span>
-          <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);">
-            Saisie des positions &amp; pièces après la manche 8
-          </span>
-        </div>
-        <div id="teams-list-grid" class="teams-list-grid"></div>
-      </div>
+      <!-- Reminder about names and token colors -->
+      <p class="screen-subtitle">Just first names. Each player keeps their token color.</p>
 
-      <div class="footer-actions">
-        <button type="button" id="btn-abort-game" class="btn btn-secondary">
-          ↺ Annuler la partie
-        </button>
-        <button type="button" id="btn-next-round" class="btn btn-primary">
-          Manche suivante →
-        </button>
-      </div>
+      <!-- Dynamic container for player name inputs -->
+      <div id="player-inputs" class="player-inputs"></div>
+      <!-- Validation error message if needed -->
+      <p id="players-error" class="error-text hidden"></p>
+
+      <!-- Start round 1 button -->
+      <button id="btn-start-game" type="button" class="cta-btn">Start game</button>
+      <!-- Bottom CARDS button below player names and start button -->
+      <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
     </section>
 
-    <!-- ÉCRAN 3 : FORMULAIRE DE FIN DE PARTIE (APRÈS LA MANCHE 8) -->
-    <section id="screen-final-form" class="hidden">
-      <div class="final-form-header">
-        <span class="badge">Fin des 8 manches • Étape finale</span>
-        <h1>Saisie des positions et des pièces</h1>
-        <p>Indiquez le nombre final de pions sur chaque étage, dans Perdus et les pièces restantes pour chaque équipe.</p>
+    <!-- 3. ROUND SCREEN -->
+    <section id="screen-round" class="hidden">
+      <!-- Top header with logo only and level badge -->
+      <header class="top-bar">
+        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
+        <span id="round-level-badge" class="level-badge is-level-2">Level 2</span>
+      </header>
+
+      <!-- Round counter and 6-bar progress indicator -->
+      <div class="round-hero">
+        <p id="round-eyebrow" class="eyebrow">Round</p>
+        <div id="round-counter" class="round-counter">1/6</div>
+        <div id="round-bars" class="round-bars"></div>
       </div>
 
-      <div id="final-form-error" class="error-banner hidden" role="alert"></div>
+      <!-- Placeholder or drawn event card -->
+      <div id="event-slot"></div>
 
-      <form id="final-form" novalidate>
-        <div id="teams-form-grid" class="teams-form-grid"></div>
+      <!-- Single contextual round action button -->
+      <button id="btn-round-action" type="button" class="cta-btn">Round 1: draw event</button>
+      <!-- Bottom CARDS button below the round event and primary action -->
+      <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+    </section>
 
-        <div class="footer-actions">
-          <button type="button" id="btn-reset-from-form" class="btn btn-secondary">
-            ↺ Recommencer une partie
-          </button>
-          <button type="submit" class="btn btn-primary">
-            Calculer le classement final 🏆
-          </button>
-        </div>
+    <!-- 4. FINAL SCORES SCREEN -->
+    <section id="screen-scores" class="hidden">
+      <!-- Top header with logo only and level badge -->
+      <header class="top-bar">
+        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
+        <span id="scores-level-badge" class="level-badge is-level-2">Level 2</span>
+      </header>
+
+      <!-- Screen title and instructions -->
+      <h1 class="screen-title">Final scores</h1>
+      <p id="scores-subtitle" class="screen-subtitle">Count your tokens on the board, enter the numbers, then check completed missions.</p>
+
+      <!-- Score entry form -->
+      <form id="scores-form" novalidate>
+        <!-- Container where player score cards are rendered -->
+        <div id="score-cards"></div>
+        <!-- Submit button to calculate final points -->
+        <button id="btn-calc-scores" type="submit" class="cta-btn is-gold">Calculate</button>
       </form>
     </section>
 
-    <!-- ÉCRAN 4 : RÉSULTATS & CLASSEMENT FINAL -->
+    <!-- 5. RESULTS SCREEN -->
     <section id="screen-results" class="hidden">
-      <div id="winner-card" class="winner-card"></div>
+      <!-- Top header with logo only and level badge -->
+      <header class="top-bar">
+        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
+        <span id="results-level-badge" class="level-badge is-level-2">Level 2</span>
+      </header>
 
-      <div class="card" style="margin-bottom: 1.25rem;">
-        <div class="section-title">
-          <span>🏆 Classement final &amp; détail des points</span>
-          <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
-            Fidél. ×3 • Conv. ×2 • 5 pièces = 1 pt • Bonus taux +3
-          </span>
-        </div>
-        <div class="table-wrap">
-          <table class="ranking-table">
-            <thead>
-              <tr>
-                <th>Rang</th>
-                <th>Équipe</th>
-                <th>Fidélisation (×3)</th>
-                <th>Conversion (×2)</th>
-                <th>Pièces (÷5)</th>
-                <th>Taux conv.</th>
-                <th>Bonus taux</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody id="ranking-tbody"></tbody>
-          </table>
-        </div>
+      <!-- Results heading -->
+      <h1 class="screen-title">Results</h1>
+
+      <!-- Highlighted winner banner -->
+      <div id="winner-banner"></div>
+      <!-- Ranked list of remaining players -->
+      <div id="runners-list"></div>
+
+      <!-- Best conversion rate bonus legend -->
+      <div class="bonus-legend">
+        <span class="mini-coin"></span>
+        <span>Best conversion rate: +3 bonus points.</span>
       </div>
 
-      <div class="card" style="margin-bottom: 1.25rem;">
-        <div class="section-title">
-          <span>🔻 Entonnoir de conversion par équipe</span>
-        </div>
-        <div id="results-funnels-grid" class="teams-form-grid"></div>
-      </div>
-
-      <div class="footer-actions">
-        <button type="button" id="btn-edit-form" class="btn btn-secondary">
-          ✏️ Modifier la saisie
-        </button>
-        <button type="button" id="btn-new-game" class="btn btn-primary">
-          🔄 Nouvelle partie
-        </button>
-      </div>
+      <!-- Button opening the reset confirmation modal -->
+      <button id="btn-results-new-game" type="button" class="cta-btn is-outline">New game</button>
     </section>
-
   </main>
 
-  <!-- ========================================================================
-       VUE 2 : GUIDE DES 12 CARTES ACTION (QR GUIDE)
-       ======================================================================== -->
-  <main id="view-guide" class="container hidden">
-    <div class="guide-header">
-      <span class="badge">Référentiel Marketing • 12 Cartes Action</span>
-      <h1>Guide des cartes Action</h1>
-      <p>Consultez le coût, l'effet en jeu, la définition marketing et un exemple concret pour chaque levier.</p>
-    </div>
-
-    <div id="guide-filter-bar" class="guide-filter-bar"></div>
-    <div id="guide-content"></div>
-  </main>
-
-  <!-- MODALE DE CONFIRMATION -->
-  <div id="confirm-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-box">
-      <h2 id="modal-title" class="modal-title">Confirmation</h2>
-      <p id="modal-text" class="modal-text"></p>
+  <!-- ROUND ADVANCEMENT CONFIRMATION MODAL -->
+  <div id="modal-round" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-round-title">
+    <div class="modal-card">
+      <div class="modal-icon is-purple">?</div>
+      <h2 id="modal-round-title" class="modal-title">Everyone played?</h2>
+      <p id="modal-round-desc" class="modal-desc"></p>
       <div class="modal-actions">
-        <button type="button" id="modal-cancel" class="btn btn-secondary">Annuler</button>
-        <button type="button" id="modal-confirm" class="btn btn-primary">Confirmer</button>
+        <button id="modal-round-cancel" type="button" class="modal-btn cancel">Cancel</button>
+        <button id="modal-round-confirm" type="button" class="modal-btn confirm-purple">Yes</button>
       </div>
     </div>
   </div>
 
-  <script>
-    (function () {
-      "use strict";
-
-      /* ======================================================================
-         1. DONNÉES DU JEU (ÉTAGES, COULEURS, ÉVÉNEMENTS, CARTES)
-         ====================================================================== */
-      const STORAGE_KEY = "funnelRush.game";
-      const TOTAL_ROUNDS = 8;
-
-      const TEAM_SLOTS = [
-        { color: "#1A8291", label: "Bleu" },
-        { color: "#E05A47", label: "Corail" },
-        { color: "#D99B26", label: "Or" },
-        { color: "#2E8B57", label: "Émeraude" }
-      ];
-
-      const FLOORS = [
-        { id: "notoriete",     name: "Notoriété",     color: "#CDEFF3" },
-        { id: "interet",       name: "Intérêt",       color: "#8FDCE5" },
-        { id: "consideration", name: "Considération", color: "#3FBCCB" },
-        { id: "conversion",    name: "Conversion",    color: "#1A8291" },
-        { id: "fidelisation",  name: "Fidélisation",  color: "#0E4F58" }
-      ];
-
-      const FLOOR_ORDER = ["notoriete", "interet", "consideration", "conversion", "fidelisation"];
-
-      const EVENTS = [
-        {
-          id: "google-update",
-          name: "Google Algorithm Update",
-          effect: "Les cartes Article SEO ne rapportent que 1 prospect ce tour."
-        },
-        {
-          id: "bad-review",
-          name: "Bad Review",
-          effect: "Chaque équipe perd 2 prospects en Considération (sauf si elle a joué Avis clients)."
-        },
-        {
-          id: "viral-post",
-          name: "Viral Post",
-          effect: "L'équipe avec le moins de prospects en Notoriété en gagne 3."
-        },
-        {
-          id: "competitor-launch",
-          name: "Competitor Launch",
-          effect: "Chaque équipe perd 1 prospect à chaque étage."
-        },
-        {
-          id: "black-friday",
-          name: "Black Friday",
-          effect: "Les cartes Conversion coûtent 1 pièce de moins cette manche."
-        },
-        {
-          id: "website-bug",
-          name: "Website Bug",
-          effect: "Personne ne peut jouer de carte Conversion ce tour."
-        }
-      ];
-
-      const CARDS = [
-        {
-          id: "pub-instagram",
-          name: "Pub Instagram",
-          floor: "notoriete",
-          floorBadge: "Market → Notoriété",
-          cost: 3,
-          effect: "Faites entrer +4 prospects en Notoriété.",
-          definition: "Publicité payante diffusée sur Instagram auprès d'une cible choisie (âge, intérêts, zone géographique). Elle permet de toucher rapidement un large public.",
-          example: "Une sponsorisation de story ciblant les 18-30 ans amateurs de sport pour faire connaître votre nouvelle application."
-        },
-        {
-          id: "article-seo",
-          name: "Article SEO",
-          floor: "notoriete",
-          floorBadge: "Market → Notoriété",
-          cost: 1,
-          effect: "Faites entrer +2 prospects en Notoriété (peu coûteux mais lent).",
-          definition: "Article de blog optimisé pour les moteurs de recherche afin d'apparaître dans les premiers résultats Google sur des requêtes précises.",
-          example: "Publier un guide pratique « Comment organiser son budget étudiant » qui attire des visiteurs chaque mois sans budget pub."
-        },
-        {
-          id: "partenariat-influenceur",
-          name: "Partenariat influenceur",
-          floor: "notoriete",
-          floorBadge: "Market → Notoriété",
-          cost: 5,
-          effect: "Faites entrer +6 prospects en Notoriété.",
-          definition: "Collaboration avec un créateur de contenu suivi par une communauté engagée qui présente la marque à son audience.",
-          example: "Un créateur tech teste votre application en vidéo et partage son lien de téléchargement à ses abonnés."
-        },
-        {
-          id: "newsletter",
-          name: "Newsletter",
-          floor: "interet",
-          floorBadge: "Notoriété → Intérêt",
-          cost: 2,
-          effect: "Faites descendre 3 prospects de Notoriété vers Intérêt.",
-          definition: "Email envoyé régulièrement aux inscrits pour maintenir le lien, partager des nouveautés et nourrir leur intérêt (nurturing).",
-          example: "Un récapitulatif hebdomadaire avec 3 astuces exclusives et les coulisses du développement de l'appli."
-        },
-        {
-          id: "livre-blanc",
-          name: "Livre blanc",
-          floor: "interet",
-          floorBadge: "Notoriété → Intérêt",
-          cost: 2,
-          effect: "Faites descendre 3 prospects de Notoriété vers Intérêt.",
-          definition: "Guide thématique gratuit offert en échange d'une adresse email. C'est un « lead magnet » qui transforme un simple visiteur en contact qualifié.",
-          example: "Télécharger un PDF gratuit « Les 10 erreurs à éviter au lancement d'une startup » après avoir laissé son email."
-        },
-        {
-          id: "webinaire",
-          name: "Webinaire",
-          floor: "consideration",
-          floorBadge: "Intérêt → Considération",
-          cost: 3,
-          effect: "Faites descendre 3 prospects d'Intérêt vers Considération.",
-          definition: "Conférence en ligne en direct où la marque démontre son expertise, présente son produit et répond aux questions des participants.",
-          example: "Une démonstration live de 30 minutes suivie d'une session questions-réponses pour lever les freins avant l'achat."
-        },
-        {
-          id: "avis-clients",
-          name: "Avis clients",
-          floor: "consideration",
-          floorBadge: "Intérêt → Considération",
-          cost: 2,
-          effect: "Faites descendre 2 prospects d'Intérêt vers Considération et protège contre l'événement « Bad Review ».",
-          definition: "Notes, étoiles et témoignages vérifiés d'utilisateurs. Cette « preuve sociale » rassure les prospects qui comparent encore les offres.",
-          example: "Afficher une note de 4,8/5 sur les stores et mettre en avant des retours d'utilisateurs satisfaits sur la page d'accueil."
-        },
-        {
-          id: "retargeting",
-          name: "Retargeting",
-          floor: "consideration",
-          floorBadge: "Perdus → Considération",
-          cost: 3,
-          effect: "Récupérez 2 prospects de la zone Perdus vers Considération.",
-          definition: "Publicité ciblée diffusée auprès des personnes ayant déjà visité le site ou abandonné leur panier sans finaliser leur achat.",
-          example: "Une bannière rappelant les avantages de l'appli à un visiteur qui avait quitté la page des tarifs la veille."
-        },
-        {
-          id: "essai-gratuit",
-          name: "Essai gratuit",
-          floor: "conversion",
-          floorBadge: "Considération → Conversion",
-          cost: 4,
-          effect: "Faites descendre 3 prospects de Considération vers Conversion.",
-          definition: "Période d'accès gratuit au produit ou aux fonctionnalités premium permettant au prospect de tester concrètement la valeur avant de payer.",
-          example: "Offrir 14 jours d'essai sans engagement de la version Pro avant le passage à l'abonnement mensuel."
-        },
-        {
-          id: "code-promo",
-          name: "Code promo",
-          floor: "conversion",
-          floorBadge: "Considération → Conversion",
-          cost: 2,
-          effect: "Faites descendre 2 prospects de Considération vers Conversion (revenus divisés par 2 ce tour).",
-          definition: "Réduction temporaire qui déclenche l'achat immédiat grâce à l'urgence, au prix d'une marge unitaire plus faible.",
-          example: "Le code BIENVENUE20 offrant -20 % sur la première commande pendant 48 heures."
-        },
-        {
-          id: "programme-fidelite",
-          name: "Programme de fidélité",
-          floor: "fidelisation",
-          floorBadge: "Conversion → Fidélisation",
-          cost: 3,
-          effect: "Faites descendre 2 clients de Conversion vers Fidélisation.",
-          definition: "Système de points, récompenses ou statuts VIP réservé aux clients existants pour encourager les achats répétés et limiter le churn.",
-          example: "Cumuler des points à chaque commande permettant de débloquer des fonctionnalités exclusives ou un mois offert."
-        },
-        {
-          id: "parrainage",
-          name: "Parrainage",
-          floor: "fidelisation",
-          floorBadge: "Conversion → Fidélisation",
-          cost: 3,
-          effect: "Faites descendre 2 clients de Conversion vers Fidélisation.",
-          definition: "Mécanisme incitant un client satisfait à recommander la marque à ses proches en échange d'une récompense partagée.",
-          example: "« Invitez un ami : vous recevez chacun 5 € de crédit dès sa première inscription. »"
-        }
-      ];
-
-      /* ======================================================================
-         2. UTILITAIRES DE SAUVEGARDE & SÉCURITÉ
-         ====================================================================== */
-      function loadGame() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          return raw ? JSON.parse(raw) : null;
-        } catch (err) {
-          return null;
-        }
-      }
-
-      function saveGame(game) {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
-        } catch (err) {
-          // Ignorer si le stockage local est indisponible
-        }
-      }
-
-      function clearGame() {
-        try {
-          localStorage.removeItem(STORAGE_KEY);
-        } catch (err) {
-          // Ignorer
-        }
-      }
-
-      function escapeHtml(str) {
-        return String(str)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-
-      /* ======================================================================
-         3. MODALE DE CONFIRMATION
-         ====================================================================== */
-      const modalBackdrop = document.getElementById("confirm-modal");
-      const modalTitleEl = document.getElementById("modal-title");
-      const modalTextEl = document.getElementById("modal-text");
-      const modalCancelBtn = document.getElementById("modal-cancel");
-      const modalConfirmBtn = document.getElementById("modal-confirm");
-      let modalConfirmCallback = null;
-
-      function openConfirm({ title, message, confirmText = "Confirmer", isDanger = false, onConfirm }) {
-        modalTitleEl.textContent = title;
-        modalTextEl.textContent = message;
-        modalConfirmBtn.textContent = confirmText;
-        modalConfirmBtn.className = isDanger ? "btn btn-danger" : "btn btn-primary";
-        modalConfirmCallback = onConfirm;
-        modalBackdrop.classList.remove("hidden");
-      }
-
-      function closeConfirm() {
-        modalBackdrop.classList.add("hidden");
-        modalConfirmCallback = null;
-      }
-
-      modalCancelBtn.addEventListener("click", closeConfirm);
-      modalBackdrop.addEventListener("click", (e) => {
-        if (e.target === modalBackdrop) closeConfirm();
-      });
-      modalConfirmBtn.addEventListener("click", () => {
-        const cb = modalConfirmCallback;
-        closeConfirm();
-        if (typeof cb === "function") cb();
-      });
-
-      /* ======================================================================
-         4. NAVIGATION ONGLETS (L'APPLI / GUIDE DES CARTES)
-         ====================================================================== */
-      const viewApp = document.getElementById("view-app");
-      const viewGuide = document.getElementById("view-guide");
-      const tabAppli = document.getElementById("tab-appli");
-      const tabGuide = document.getElementById("tab-guide");
-      const logoLink = document.getElementById("logo-link");
-
-      function switchMainView(target) {
-        if (target === "guide") {
-          viewApp.classList.add("hidden");
-          viewGuide.classList.remove("hidden");
-          tabGuide.classList.add("active");
-          tabAppli.classList.remove("active");
-        } else {
-          viewGuide.classList.add("hidden");
-          viewApp.classList.remove("hidden");
-          tabAppli.classList.add("active");
-          tabGuide.classList.remove("active");
-          renderAppScreen();
-        }
-      }
-
-      tabAppli.addEventListener("click", () => {
-        history.replaceState(null, "", "#appli");
-        switchMainView("appli");
-      });
-
-      logoLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        history.replaceState(null, "", "#appli");
-        switchMainView("appli");
-      });
-
-      tabGuide.addEventListener("click", () => {
-        history.replaceState(null, "", "#guide");
-        switchMainView("guide");
-      });
-
-      function handleUrlHash() {
-        const hash = window.location.hash.replace("#", "").trim();
-        if (!hash || hash === "appli") {
-          switchMainView("appli");
-          return;
-        }
-        if (hash === "guide") {
-          switchMainView("guide");
-          return;
-        }
-        const matchingCard = CARDS.find(c => c.id === hash);
-        if (matchingCard) {
-          switchMainView("guide");
-          setTimeout(() => {
-            const cardEl = document.getElementById(matchingCard.id);
-            if (cardEl) {
-              document.querySelectorAll(".action-card.is-targeted").forEach(el => el.classList.remove("is-targeted"));
-              cardEl.classList.add("is-targeted");
-              cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-          }, 60);
-        }
-      }
-
-      window.addEventListener("hashchange", handleUrlHash);
-
-      /* ======================================================================
-         5. ÉCRAN 1 : INSCRIPTION DES ÉQUIPES
-         ====================================================================== */
-      const setupForm = document.getElementById("setup-form");
-      const playerInputsList = document.getElementById("player-inputs-list");
-      const setupErrorEl = document.getElementById("setup-error");
-
-      function buildSetupInputs() {
-        playerInputsList.innerHTML = TEAM_SLOTS.map((slot, idx) => `
-          <div class="player-input-row">
-            <span class="team-color-dot" style="background-color: ${slot.color};" aria-hidden="true"></span>
-            <input
-              type="text"
-              class="player-text-input"
-              id="team-name-${idx}"
-              maxlength="24"
-              placeholder="Nom de l'équipe ${idx + 1}${idx < 2 ? ' (obligatoire)' : ' (optionnel)'}"
-              autocomplete="off"
-            />
-            <span class="team-color-label">${slot.label}</span>
-          </div>
-        `).join("");
-      }
-
-      setupForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        setupErrorEl.classList.add("hidden");
-
-        const players = [];
-        TEAM_SLOTS.forEach((slot, idx) => {
-          const input = document.getElementById(`team-name-${idx}`);
-          const name = input ? input.value.trim() : "";
-          if (name) {
-            players.push({
-              name,
-              color: slot.color,
-              colorLabel: slot.label,
-              coins: 0,
-              lost: 0,
-              floors: {
-                notoriete: 0,
-                interet: 0,
-                consideration: 0,
-                conversion: 0,
-                fidelisation: 0
-              }
-            });
-          }
-        });
-
-        if (players.length < 2) {
-          setupErrorEl.textContent = "Veuillez inscrire au moins 2 équipes pour démarrer la partie.";
-          setupErrorEl.classList.remove("hidden");
-          return;
-        }
-
-        const newGame = {
-          round: 1,
-          eventId: null,
-          lastEventId: null,
-          roundsCompleted: false,
-          submitted: false,
-          players
-        };
-
-        saveGame(newGame);
-        renderAppScreen();
-      });
-
-      /* ======================================================================
-         6. ÉCRAN 2 : MANCHES 1 À 8 (TIRAGE D'ÉVÉNEMENTS ALÉATOIRES)
-         ====================================================================== */
-      const roundLabelEl = document.getElementById("round-label");
-      const roundDotsEl = document.getElementById("round-dots");
-      const btnDrawEvent = document.getElementById("btn-draw-event");
-      const eventAreaEl = document.getElementById("event-area");
-      const teamsListGrid = document.getElementById("teams-list-grid");
-      const btnNextRound = document.getElementById("btn-next-round");
-      const btnAbortGame = document.getElementById("btn-abort-game");
-
-      btnDrawEvent.addEventListener("click", () => {
-        const game = loadGame();
-        if (!game || game.roundsCompleted || game.eventId) return;
-
-        const choices = EVENTS.filter(ev => ev.id !== game.lastEventId);
-        const selected = choices[Math.floor(Math.random() * choices.length)];
-        game.eventId = selected.id;
-        saveGame(game);
-        renderRoundsScreen(game);
-      });
-
-      btnNextRound.addEventListener("click", () => {
-        const game = loadGame();
-        if (!game || game.roundsCompleted) return;
-
-        const isLast = game.round >= TOTAL_ROUNDS;
-        openConfirm({
-          title: isLast ? "Terminer la manche 8 ?" : `Passer à la manche ${game.round + 1} / ${TOTAL_ROUNDS} ?`,
-          message: isLast
-            ? "Les 8 manches sont terminées. Vous allez accéder au formulaire pour renseigner les positions finales des pions et les pièces de chaque équipe."
-            : `Confirmez-vous la fin de la manche ${game.round} pour passer à la manche ${game.round + 1} ?`,
-          confirmText: isLast ? "Saisir le bilan final →" : "Manche suivante →",
-          onConfirm: () => {
-            const current = loadGame();
-            if (!current) return;
-            current.lastEventId = current.eventId;
-            current.eventId = null;
-            if (current.round >= TOTAL_ROUNDS) {
-              current.roundsCompleted = true;
-              current.submitted = false;
-            } else {
-              current.round += 1;
-            }
-            saveGame(current);
-            renderAppScreen();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        });
-      });
-
-      btnAbortGame.addEventListener("click", () => {
-        openConfirm({
-          title: "Annuler la partie en cours ?",
-          message: "La partie actuelle sera effacée et vous reviendrez à l'écran d'inscription.",
-          confirmText: "Oui, annuler",
-          isDanger: true,
-          onConfirm: () => {
-            clearGame();
-            buildSetupInputs();
-            renderAppScreen();
-          }
-        });
-      });
-
-      function renderRoundsScreen(game) {
-        roundLabelEl.textContent = `Manche ${game.round} / ${TOTAL_ROUNDS}`;
-
-        let dotsHtml = "";
-        for (let i = 1; i <= TOTAL_ROUNDS; i++) {
-          const cls = i < game.round ? "round-dot done" : (i === game.round ? "round-dot current" : "round-dot");
-          dotsHtml += `<span class="${cls}"></span>`;
-        }
-        roundDotsEl.innerHTML = dotsHtml;
-
-        if (game.eventId) {
-          btnDrawEvent.disabled = true;
-          btnDrawEvent.textContent = "✓ Événement tiré";
-          const ev = EVENTS.find(item => item.id === game.eventId);
-          if (ev) {
-            eventAreaEl.innerHTML = `
-              <div class="event-box-revealed">
-                <span class="event-tag">Carte Événement • Manche ${game.round}</span>
-                <div class="event-name">${escapeHtml(ev.name)}</div>
-                <div class="event-desc">${escapeHtml(ev.effect)}</div>
-              </div>
-            `;
-          }
-        } else {
-          btnDrawEvent.disabled = false;
-          btnDrawEvent.textContent = "⚡ Tirer l'événement";
-          eventAreaEl.innerHTML = `
-            <div class="event-box-empty">
-              Appuyez sur <strong>« Tirer l'événement »</strong> pour révéler l'événement de la manche ${game.round}.
-            </div>
-          `;
-        }
-
-        teamsListGrid.innerHTML = game.players.map((p, idx) => `
-          <div class="team-chip-card" style="border-left-color: ${p.color};">
-            <div class="team-chip-info">
-              <span class="team-color-dot" style="background-color: ${p.color};"></span>
-              <div>
-                <div class="team-chip-name">${escapeHtml(p.name)}</div>
-                <div class="team-chip-sub">Équipe ${idx + 1} • Jetons ${escapeHtml(p.colorLabel)}</div>
-              </div>
-            </div>
-            <span class="badge">En jeu</span>
-          </div>
-        `).join("");
-
-        btnNextRound.textContent = game.round >= TOTAL_ROUNDS
-          ? "Fin de la manche 8 → Saisir le bilan"
-          : `Manche suivante (${game.round + 1}/${TOTAL_ROUNDS}) →`;
-      }
-
-      /* ======================================================================
-         7. ÉCRAN 3 : FORMULAIRE DE SAISIE FINALE (APRÈS LA MANCHE 8)
-         ====================================================================== */
-      const finalForm = document.getElementById("final-form");
-      const teamsFormGrid = document.getElementById("teams-form-grid");
-      const finalFormErrorEl = document.getElementById("final-form-error");
-      const btnResetFromForm = document.getElementById("btn-reset-from-form");
-
-      btnResetFromForm.addEventListener("click", () => {
-        openConfirm({
-          title: "Recommencer une partie ?",
-          message: "Toutes les données de cette partie seront effacées pour revenir à l'inscription.",
-          confirmText: "Oui, recommencer",
-          isDanger: true,
-          onConfirm: () => {
-            clearGame();
-            buildSetupInputs();
-            renderAppScreen();
-          }
-        });
-      });
-
-      function renderFinalForm(game) {
-        finalFormErrorEl.classList.add("hidden");
-
-        teamsFormGrid.innerHTML = game.players.map((p, pIdx) => {
-          const floorRows = FLOORS.map(f => {
-            const val = Math.max(0, Number(p.floors[f.id]) || 0);
-            return `
-              <div class="stepper-row">
-                <label class="stepper-label" for="input-${pIdx}-${f.id}">
-                  <span class="floor-dot" style="background-color: ${f.color};"></span>
-                  <span>${f.name}</span>
-                </label>
-                <div class="stepper-controls">
-                  <button type="button" class="step-btn" data-action="dec" data-target="input-${pIdx}-${f.id}" aria-label="Diminuer ${f.name}">−</button>
-                  <input type="number" min="0" step="1" id="input-${pIdx}-${f.id}" class="step-input" value="${val}" />
-                  <button type="button" class="step-btn" data-action="inc" data-target="input-${pIdx}-${f.id}" aria-label="Augmenter ${f.name}">+</button>
-                </div>
-              </div>
-            `;
-          }).join("");
-
-          const lostVal = Math.max(0, Number(p.lost) || 0);
-          const coinsVal = Math.max(0, Number(p.coins) || 0);
-
-          return `
-            <article class="team-form-card" style="border-top-color: ${p.color};">
-              <div class="team-form-card-head">
-                <div class="team-form-title">
-                  <span class="team-color-dot" style="background-color: ${p.color};"></span>
-                  <span>${escapeHtml(p.name)}</span>
-                </div>
-                <span class="badge">Équipe ${pIdx + 1}</span>
-              </div>
-
-              ${floorRows}
-
-              <div class="stepper-row is-lost">
-                <label class="stepper-label" for="input-${pIdx}-lost">
-                  <span>Perdus (Lost)</span>
-                </label>
-                <div class="stepper-controls">
-                  <button type="button" class="step-btn" data-action="dec" data-target="input-${pIdx}-lost" aria-label="Diminuer Perdus">−</button>
-                  <input type="number" min="0" step="1" id="input-${pIdx}-lost" class="step-input" value="${lostVal}" />
-                  <button type="button" class="step-btn" data-action="inc" data-target="input-${pIdx}-lost" aria-label="Augmenter Perdus">+</button>
-                </div>
-              </div>
-
-              <div class="stepper-row is-coins">
-                <label class="stepper-label" for="input-${pIdx}-coins">
-                  <span>🪙 Pièces restantes</span>
-                </label>
-                <div class="stepper-controls">
-                  <button type="button" class="step-btn" data-action="dec" data-target="input-${pIdx}-coins" aria-label="Diminuer Pièces">−</button>
-                  <input type="number" min="0" step="1" id="input-${pIdx}-coins" class="step-input" value="${coinsVal}" />
-                  <button type="button" class="step-btn" data-action="inc" data-target="input-${pIdx}-coins" aria-label="Augmenter Pièces">+</button>
-                </div>
-              </div>
-            </article>
-          `;
-        }).join("");
-      }
-
-      // Gestion des boutons + / - du formulaire final
-      teamsFormGrid.addEventListener("click", (e) => {
-        const btn = e.target.closest(".step-btn");
-        if (!btn) return;
-        const input = document.getElementById(btn.dataset.target);
-        if (!input) return;
-
-        const current = Math.max(0, Math.floor(Number(input.value) || 0));
-        const next = btn.dataset.action === "inc" ? current + 1 : Math.max(0, current - 1);
-        input.value = next;
-      });
-
-      finalForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        finalFormErrorEl.classList.add("hidden");
-
-        const game = loadGame();
-        if (!game) return;
-
-        let invalid = false;
-
-        game.players.forEach((p, pIdx) => {
-          FLOOR_ORDER.forEach(fId => {
-            const el = document.getElementById(`input-${pIdx}-${fId}`);
-            const val = el ? Number(el.value) : 0;
-            if (!Number.isFinite(val) || val < 0) {
-              invalid = true;
-            } else {
-              p.floors[fId] = Math.floor(val);
-            }
-          });
-
-          const lostEl = document.getElementById(`input-${pIdx}-lost`);
-          const lostVal = lostEl ? Number(lostEl.value) : 0;
-          if (!Number.isFinite(lostVal) || lostVal < 0) {
-            invalid = true;
-          } else {
-            p.lost = Math.floor(lostVal);
-          }
-
-          const coinsEl = document.getElementById(`input-${pIdx}-coins`);
-          const coinsVal = coinsEl ? Number(coinsEl.value) : 0;
-          if (!Number.isFinite(coinsVal) || coinsVal < 0) {
-            invalid = true;
-          } else {
-            p.coins = Math.floor(coinsVal);
-          }
-        });
-
-        if (invalid) {
-          finalFormErrorEl.textContent = "Veuillez saisir uniquement des nombres positifs ou nuls (0 ou plus).";
-          finalFormErrorEl.classList.remove("hidden");
-          return;
-        }
-
-        game.submitted = true;
-        saveGame(game);
-        renderAppScreen();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      /* ======================================================================
-         8. ÉCRAN 4 : CALCUL DES SCORES & CLASSEMENT FINAL
-         ====================================================================== */
-      const winnerCardEl = document.getElementById("winner-card");
-      const rankingTbodyEl = document.getElementById("ranking-tbody");
-      const resultsFunnelsGrid = document.getElementById("results-funnels-grid");
-      const btnEditForm = document.getElementById("btn-edit-form");
-      const btnNewGame = document.getElementById("btn-new-game");
-
-      function getPlayerStats(p) {
-        const onFloors = FLOOR_ORDER.reduce((sum, id) => sum + (Number(p.floors[id]) || 0), 0);
-        const lost = Number(p.lost) || 0;
-        const entered = onFloors + lost;
-        const customers = (Number(p.floors.conversion) || 0) + (Number(p.floors.fidelisation) || 0);
-        const rate = entered > 0 ? customers / entered : 0;
-        return { onFloors, lost, entered, customers, rate };
-      }
-
-      function reachedFloor(p, floorIndex) {
-        return FLOOR_ORDER.slice(floorIndex).reduce((sum, id) => sum + (Number(p.floors[id]) || 0), 0);
-      }
-
-      function computeRanking(players) {
-        const enriched = players.map(p => ({ player: p, stats: getPlayerStats(p) }));
-        const bestRate = Math.max(...enriched.map(item => item.stats.rate));
-
-        return enriched
-          .map(({ player, stats }) => {
-            const fid = Number(player.floors.fidelisation) || 0;
-            const conv = Number(player.floors.conversion) || 0;
-            const coins = Number(player.coins) || 0;
-
-            const ptsFid = 3 * fid;
-            const ptsConv = 2 * conv;
-            const ptsCoins = Math.floor(coins / 5);
-            const hasBonus = bestRate > 0 && Math.abs(stats.rate - bestRate) < 1e-9;
-            const ptsBonus = hasBonus ? 3 : 0;
-            const total = ptsFid + ptsConv + ptsCoins + ptsBonus;
-
-            return {
-              ...player,
-              stats,
-              ptsFid,
-              ptsConv,
-              ptsCoins,
-              ptsBonus,
-              hasBonus,
-              total
-            };
-          })
-          .sort((a, b) => {
-            if (b.total !== a.total) return b.total - a.total;
-            return b.stats.rate - a.stats.rate;
-          });
-      }
-
-      function formatPercent(rate) {
-        return `${(rate * 100).toFixed(1).replace(".0", "")} %`;
-      }
-
-      btnEditForm.addEventListener("click", () => {
-        const game = loadGame();
-        if (!game) return;
-        game.submitted = false;
-        saveGame(game);
-        renderAppScreen();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      btnNewGame.addEventListener("click", () => {
-        openConfirm({
-          title: "Démarrer une nouvelle partie ?",
-          message: "Le classement actuel sera effacé pour revenir à l'écran d'inscription.",
-          confirmText: "Nouvelle partie",
-          isDanger: true,
-          onConfirm: () => {
-            clearGame();
-            buildSetupInputs();
-            renderAppScreen();
-          }
-        });
-      });
-
-      function renderResultsScreen(game) {
-        const ranking = computeRanking(game.players);
-        const topScore = ranking[0] ? ranking[0].total : 0;
-        const winners = ranking.filter(r => r.total === topScore);
-
-        winnerCardEl.innerHTML = `
-          <div class="winner-emoji">🏆</div>
-          <div class="winner-kicker">${winners.length > 1 ? "Vainqueurs ex æquo" : "Équipe gagnante"}</div>
-          <div class="winner-title">${winners.map(w => escapeHtml(w.name)).join(" & ")}</div>
-          <div class="winner-points">Score final : ${topScore} point${topScore > 1 ? "s" : ""}</div>
-        `;
-
-        rankingTbodyEl.innerHTML = ranking.map((r, idx) => {
-          const isFirst = r.total === topScore;
-          return `
-            <tr class="${isFirst ? "is-first" : ""}">
-              <td><strong>#${idx + 1}</strong></td>
-              <td>
-                <div style="display:flex; align-items:center; gap:0.55rem;">
-                  <span class="team-color-dot" style="width:16px; height:16px; background-color:${r.color};"></span>
-                  <strong>${escapeHtml(r.name)}</strong>
-                </div>
-              </td>
-              <td>${r.ptsFid} pts (${r.floors.fidelisation || 0})</td>
-              <td>${r.ptsConv} pts (${r.floors.conversion || 0})</td>
-              <td>${r.ptsCoins} pt${r.ptsCoins > 1 ? "s" : ""} (${r.coins} 🪙)</td>
-              <td><strong>${formatPercent(r.stats.rate)}</strong> (${r.stats.customers}/${r.stats.entered})</td>
-              <td>${r.hasBonus ? '<span class="bonus-badge">+3 pts</span>' : "0 pt"}</td>
-              <td class="total-pts-cell">${r.total} pts</td>
-            </tr>
-          `;
-        }).join("");
-
-        resultsFunnelsGrid.innerHTML = ranking.map(r => {
-          const maxEntered = Math.max(r.stats.entered, 1);
-          const barsHtml = FLOORS.map((f, fIdx) => {
-            const count = reachedFloor(r, fIdx);
-            const pct = r.stats.entered > 0 ? Math.round((count / maxEntered) * 100) : 0;
-            return `
-              <div class="funnel-row">
-                <span class="funnel-name">${f.name}</span>
-                <div class="funnel-track">
-                  <div class="funnel-fill" style="width:${pct}%; background-color:${f.color};"></div>
-                </div>
-                <span class="funnel-val">${count}</span>
-              </div>
-            `;
-          }).join("");
-
-          return `
-            <article class="team-form-card" style="border-top-color: ${r.color};">
-              <div class="team-form-card-head">
-                <div class="team-form-title">
-                  <span class="team-color-dot" style="background-color: ${r.color};"></span>
-                  <span>${escapeHtml(r.name)}</span>
-                </div>
-                <span class="badge">Taux : ${formatPercent(r.stats.rate)}</span>
-              </div>
-              <div style="font-size:0.84rem; color:var(--text-muted);">
-                Entrés dans le tunnel : <strong>${r.stats.entered}</strong> • Perdus : <strong>${r.stats.lost}</strong>
-              </div>
-              <div class="funnel-bars-list">
-                ${barsHtml}
-              </div>
-            </article>
-          `;
-        }).join("");
-      }
-
-      /* ======================================================================
-         9. ROUTAGE DES ÉCRANS DE L'APPLICATION
-         ====================================================================== */
-      const screenInscription = document.getElementById("screen-inscription");
-      const screenRounds = document.getElementById("screen-rounds");
-      const screenFinalForm = document.getElementById("screen-final-form");
-      const screenResults = document.getElementById("screen-results");
-
-      function renderAppScreen() {
-        const game = loadGame();
-
-        screenInscription.classList.add("hidden");
-        screenRounds.classList.add("hidden");
-        screenFinalForm.classList.add("hidden");
-        screenResults.classList.add("hidden");
-
-        if (!game) {
-          if (!playerInputsList.hasChildNodes()) buildSetupInputs();
-          screenInscription.classList.remove("hidden");
-        } else if (!game.roundsCompleted) {
-          screenRounds.classList.remove("hidden");
-          renderRoundsScreen(game);
-        } else if (!game.submitted) {
-          screenFinalForm.classList.remove("hidden");
-          renderFinalForm(game);
-        } else {
-          screenResults.classList.remove("hidden");
-          renderResultsScreen(game);
-        }
-      }
-
-      /* ======================================================================
-         10. GUIDE DES 12 CARTES ACTION
-         ====================================================================== */
-      const guideFilterBar = document.getElementById("guide-filter-bar");
-      const guideContentEl = document.getElementById("guide-content");
-      let activeFloorFilter = "all";
-
-      function renderGuide() {
-        const filters = [{ id: "all", name: "Toutes les cartes (12)" }, ...FLOORS];
-        guideFilterBar.innerHTML = filters.map(f => `
-          <button type="button" class="filter-pill ${activeFloorFilter === f.id ? "active" : ""}" data-filter="${f.id}">
-            ${f.name}
-          </button>
-        `).join("");
-
-        const visibleFloors = activeFloorFilter === "all"
-          ? FLOORS
-          : FLOORS.filter(f => f.id === activeFloorFilter);
-
-        guideContentEl.innerHTML = visibleFloors.map(floor => {
-          const floorCards = CARDS.filter(c => c.floor === floor.id);
-          return `
-            <section class="guide-floor-group">
-              <h2 class="guide-floor-heading">
-                <span class="floor-dot" style="width:18px; height:18px; background-color:${floor.color};"></span>
-                <span>Étage : ${floor.name}</span>
-              </h2>
-              <div class="guide-cards-grid">
-                ${floorCards.map(card => `
-                  <article class="action-card" id="${card.id}">
-                    <div class="action-card-top">
-                      <div>
-                        <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:0.2rem;">
-                          ${escapeHtml(card.floorBadge)}
-                        </div>
-                        <h3 class="action-card-title">${escapeHtml(card.name)}</h3>
-                      </div>
-                      <span class="cost-pill">🪙 Coût : ${card.cost}</span>
-                    </div>
-                    <div class="action-effect-box">
-                      ⚡ ${escapeHtml(card.effect)}
-                    </div>
-                    <p class="action-def">${escapeHtml(card.definition)}</p>
-                    <div class="action-example">
-                      <strong>Exemple :</strong> ${escapeHtml(card.example)}
-                    </div>
-                  </article>
-                `).join("")}
-              </div>
-            </section>
-          `;
-        }).join("");
-      }
-
-      guideFilterBar.addEventListener("click", (e) => {
-        const btn = e.target.closest(".filter-pill");
-        if (!btn) return;
-        activeFloorFilter = btn.dataset.filter;
-        renderGuide();
-      });
-
-      /* ======================================================================
-         11. INITIALISATION AU CHARGEMENT
-         ====================================================================== */
-      buildSetupInputs();
-      renderGuide();
-      handleUrlHash();
-    })();
-  </script>
+  <!-- ERASE GAME CONFIRMATION MODAL -->
+  <div id="modal-reset" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-reset-title">
+    <div class="modal-card">
+      <div class="modal-icon is-danger">!</div>
+      <h2 id="modal-reset-title" class="modal-title">Erase game?</h2>
+      <p class="modal-desc">Scores will be deleted from this device.</p>
+      <div class="modal-actions">
+        <button id="modal-reset-cancel" type="button" class="modal-btn cancel">Cancel</button>
+        <button id="modal-reset-confirm" type="button" class="modal-btn confirm-danger">Erase</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
