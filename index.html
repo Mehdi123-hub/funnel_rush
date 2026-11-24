@@ -27,30 +27,30 @@
         <!-- Game tagline -->
         <h1 class="hero-title">Turn strangers into loyal customers.</h1>
         <!-- Format and player count note -->
-        <p class="hero-subtitle">A conversion funnel board game - 2 to 4 players</p>
+        <p class="hero-subtitle">A conversion funnel board game · 2 to 4 players</p>
 
         <!-- Level selector prompt -->
         <p class="level-picker-label">Choose level</p>
-        <!-- Two-option level radio group -->
+        <!-- Two-option round level radio group -->
         <div class="level-grid" role="radiogroup" aria-label="Choose level">
-          <!-- Level 1 card -->
+          <!-- Round Level 1 button -->
           <button type="button" class="level-card" data-level="1" aria-pressed="false">
             <div class="level-card-top">
               <span class="level-num">1</span>
               <span class="radio-dot"></span>
             </div>
             <div class="level-card-title">Level 1</div>
-            <p class="level-card-desc">Discovery - 20 coins</p>
+            <p class="level-card-desc">Discovery<br><span class="coin-line">20 coins</span></p>
           </button>
 
-          <!-- Level 2 card (selected by default) -->
+          <!-- Round Level 2 button (selected by default) -->
           <button type="button" class="level-card level-2-card is-selected" data-level="2" aria-pressed="true">
             <div class="level-card-top">
               <span class="level-num">2</span>
               <span class="radio-dot"></span>
             </div>
             <div class="level-card-title">Level 2</div>
-            <p class="level-card-desc">Expert - 15 coins - secret missions</p>
+            <p class="level-card-desc">Expert · 15<br><span class="coin-line">coins · missions</span></p>
           </button>
         </div>
       </div>
@@ -60,6 +60,8 @@
         <button id="btn-new-game" type="button" class="cta-btn">New game</button>
         <!-- Bottom CARDS button opening the Card Guide -->
         <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+        <!-- Helper note for QR re-entry -->
+        <p class="helper-note">Scan the board's APP QR code to return to your game.</p>
       </div>
     </section>
 

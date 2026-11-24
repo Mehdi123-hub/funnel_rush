@@ -16,14 +16,21 @@
   <!-- Card guide module script -->
   <script type="module" src="./js/guide.js"></script>
 </head>
-<body>
+<body class="guide-page">
   <!-- Centered mobile-first container -->
   <main class="app-shell">
-    <!-- Top header with logo only and card count badge -->
+    <!-- Top header with logo, return-to-game button above 15 CARDS badge, and 15 CARDS badge -->
     <header class="top-bar">
       <a href="./index.html" class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></a>
-      <span class="level-badge is-level-2">15 cards</span>
+      <div class="header-actions">
+        <!-- Return to active game button placed right above the 15 CARDS badge -->
+        <a href="./index.html" id="btn-return-game" class="return-game-btn">Back to game</a>
+        <span class="level-badge is-level-2">15 CARDS</span>
+      </div>
     </header>
+
+    <!-- Link allowing direct return to the home screen -->
+    <a href="./index.html" class="guide-home-link">&lsaquo; Home screen</a>
 
     <!-- List view -->
     <section id="guide-list-view">

@@ -8,6 +8,7 @@
   --line: #dad4f5; /* Subtle border color for cards and inputs */
   --primary: #6528ff; /* Electric purple primary brand accent */
   --primary-hover: #5217eb; /* Darker purple on button hover */
+  --blue-selected: #1d6ff2; /* Vivid blue when Level 1 is selected */
   --level2-bg: #33128e; /* Deep violet surface for Level 2 indicators */
   --level2-tint: #9d7dff; /* Soft violet accent inside Level 2 elements */
   --gold: #f6be28; /* Gold coin and event header accent */
@@ -49,6 +50,12 @@ button {
   background: none; /* Remove default background */
 }
 
+/* Keep links clean when styled as buttons or nav actions */
+a {
+  color: inherit; /* Inherit text color */
+  text-decoration: none; /* Remove underline by default */
+}
+
 /* Utility class to hide elements reliably */
 .hidden {
   display: none !important; /* Force hide even over other display rules */
@@ -68,11 +75,42 @@ button {
 
 /* Top navigation / status bar */
 .top-bar {
-  display: flex; /* Place logo and level badge side by side */
+  display: flex; /* Place logo and right actions side by side */
   align-items: center; /* Vertically center items */
   justify-content: space-between; /* Push items to opposite edges */
-  gap: 12px; /* Minimum spacing between logo and badge */
+  gap: 10px; /* Minimum spacing between items */
   margin-bottom: 20px; /* Space below top bar */
+}
+
+/* Right cluster inside header (e.g. Back to game + 15 CARDS badge) */
+.header-actions {
+  display: inline-flex; /* Align buttons/badges horizontally */
+  align-items: center; /* Vertically center items */
+  gap: 8px; /* Space between action and badge */
+  flex-shrink: 0; /* Prevent wrapping/squishing */
+}
+
+/* Compact button to return to an active game from the card guide */
+.return-game-btn {
+  display: inline-flex; /* Inline pill button */
+  align-items: center; /* Vertically center label */
+  justify-content: center; /* Center label */
+  padding: 7px 13px; /* Compact pill padding */
+  border-radius: var(--radius-pill); /* Pill shape */
+  background: var(--surface); /* White background */
+  color: var(--ink); /* Black/ink text */
+  border: 2px solid var(--line); /* Soft border */
+  font-size: 0.74rem; /* Compact uppercase font */
+  font-weight: 900; /* Heavy weight */
+  letter-spacing: 0.06em; /* Slight letter spacing */
+  text-transform: uppercase; /* Uppercase */
+  white-space: nowrap; /* Keep on one line */
+}
+
+/* Hover state for return-to-game button */
+.return-game-btn:hover {
+  border-color: var(--primary); /* Highlight border */
+  color: var(--primary); /* Purple text on hover */
 }
 
 /* Compact brand logo inside inner headers without duplicate text */
@@ -84,7 +122,7 @@ button {
 
 /* Logo image size inside inner headers */
 .brand-logo-only img {
-  height: 80px; /* Default header logo height */
+  height: 34px; /* Default header logo height */
   width: auto; /* Keep natural aspect ratio */
   display: block; /* Prevent inline baseline gap */
 }
@@ -100,12 +138,13 @@ button {
   font-weight: 900; /* Heavy label weight */
   letter-spacing: 0.08em; /* Wide tracking for uppercase badge */
   text-transform: uppercase; /* Force uppercase text */
+  white-space: nowrap; /* Prevent badge text wrap */
 }
 
 /* Styling for Level 1 badge */
 .level-badge.is-level-1 {
   background: var(--surface); /* White background */
-  color: var(--primary); /* Purple text */
+  color: var(--blue-selected); /* Blue text */
   border: 2px solid var(--line); /* Soft lavender border */
 }
 
@@ -178,37 +217,46 @@ h1, h2, h3, p {
   margin-bottom: 12px; /* Space before cards */
 }
 
-/* Two-column grid for Level 1 and Level 2 cards */
+/* Two-column grid for round Level 1 and Level 2 selectors */
 .level-grid {
   display: grid; /* CSS grid */
-  grid-template-columns: 1fr 1fr; /* Two equal columns */
-  gap: 14px; /* Gap between cards */
-  margin-bottom: 20px; /* Space below cards */
+  grid-template-columns: repeat(2, minmax(0, 156px)); /* Two balanced circular level columns */
+  justify-content: center; /* Center the pair on the home screen */
+  gap: 16px; /* Gap between round level buttons */
+  margin-bottom: 20px; /* Space below level selectors */
 }
 
-/* Individual level option card */
+/* Round level selector button */
 .level-card {
   position: relative; /* Positioning context */
-  text-align: left; /* Left-align text inside card */
-  border-radius: var(--radius-lg); /* Rounded card corners */
-  padding: 18px 16px; /* Inner card padding */
+  width: 100%; /* Fill grid cell */
+  aspect-ratio: 1 / 1; /* Keep round/circular shape */
+  border-radius: 50%; /* Full circle */
+  text-align: center; /* Center content inside circle */
+  padding: 16px 14px; /* Inner circular padding */
   background: var(--surface); /* White background */
-  border: 2px solid var(--line); /* Default border */
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; /* Smooth state transitions */
+  border: 2.5px solid var(--line); /* Default border */
+  display: flex; /* Flex column inside circle */
+  flex-direction: column; /* Stack number, title, description */
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; /* Smooth transitions */
 }
 
-/* Press feedback on level card */
+/* Press feedback on level button */
 .level-card:active {
-  transform: scale(0.98); /* Subtle press shrink */
+  transform: scale(0.97); /* Subtle press shrink */
 }
 
-/* Active selected state for Level 1 card */
-.level-card.is-selected {
-  border-color: var(--primary); /* Highlight border in purple */
-  box-shadow: 0 10px 24px rgba(101, 40, 255, 0.14); /* Soft purple elevation */
+/* Blue selected state for Level 1 round button */
+.level-card[data-level="1"].is-selected {
+  background: var(--blue-selected); /* Blue fill when Level 1 is selected */
+  border-color: var(--blue-selected); /* Matching blue border */
+  color: #ffffff; /* White text for contrast */
+  box-shadow: 0 12px 26px rgba(29, 111, 242, 0.28); /* Blue elevation */
 }
 
-/* Active selected state for Level 2 card */
+/* Active selected state for Level 2 round button */
 .level-card.level-2-card.is-selected {
   background: var(--level2-bg); /* Deep violet fill */
   border-color: var(--level2-bg); /* Matching border */
@@ -216,32 +264,38 @@ h1, h2, h3, p {
   box-shadow: 0 12px 28px rgba(51, 18, 142, 0.28); /* Deeper shadow */
 }
 
-/* Top row inside level card (big number + radio circle) */
+/* Top row inside round level selector */
 .level-card-top {
-  display: flex; /* Horizontal flex row */
-  justify-content: space-between; /* Number left, radio right */
-  align-items: flex-start; /* Align to top */
-  margin-bottom: 18px; /* Space before title */
+  display: flex; /* Align number and radio dot */
+  justify-content: center; /* Center horizontally inside circle */
+  align-items: center; /* Align vertically */
+  gap: 8px; /* Space between big digit and dot */
+  margin-bottom: 4px; /* Tight spacing above title */
 }
 
-/* Giant italic number inside level card */
+/* Giant italic number inside level selector */
 .level-num {
-  font-size: 3rem; /* Large display number */
+  font-size: 2.35rem; /* Bold display digit inside circle */
   font-weight: 900; /* Extra bold */
   font-style: italic; /* Italic slant */
-  line-height: 0.9; /* Tight vertical height */
-  color: #93c5fd; /* Light blue for Level 1 */
+  line-height: 0.95; /* Tight vertical height */
+  color: var(--blue-selected); /* Blue for Level 1 */
 }
 
-/* Soft purple number for Level 2 card */
+/* Soft purple number for Level 2 selector */
 .level-card.level-2-card .level-num {
   color: var(--level2-tint); /* Light violet tint */
 }
 
+/* White digit when Level 1 or Level 2 is selected */
+.level-card.is-selected .level-num {
+  color: #ffffff; /* White digit on filled circle */
+}
+
 /* Outer circle of the custom radio indicator */
 .radio-dot {
-  width: 24px; /* Circle width */
-  height: 24px; /* Circle height */
+  width: 18px; /* Compact radio circle inside round selector */
+  height: 18px; /* Compact radio circle */
   border-radius: 50%; /* Full circle */
   border: 2px solid #c9c2e8; /* Unselected ring color */
   display: grid; /* Center inner dot */
@@ -250,8 +304,8 @@ h1, h2, h3, p {
 }
 
 /* Selected radio ring on Level 1 */
-.level-card.is-selected .radio-dot {
-  border-color: var(--primary); /* Purple ring */
+.level-card[data-level="1"].is-selected .radio-dot {
+  border-color: #ffffff; /* White ring on blue fill */
 }
 
 /* Selected radio ring on Level 2 */
@@ -259,38 +313,43 @@ h1, h2, h3, p {
   border-color: #ffffff; /* White ring */
 }
 
-/* Inner dot when Level 1 card is selected */
-.level-card.is-selected .radio-dot::after {
+/* Inner dot when Level 1 is selected */
+.level-card[data-level="1"].is-selected .radio-dot::after {
   content: ""; /* Required for pseudo-element */
-  width: 12px; /* Inner dot diameter */
-  height: 12px; /* Inner dot diameter */
+  width: 8px; /* Inner dot diameter */
+  height: 8px; /* Inner dot diameter */
   border-radius: 50%; /* Circular dot */
-  background: var(--primary); /* Purple inner dot */
+  background: var(--blue-selected); /* Blue inner dot */
 }
 
 /* Inner dot when Level 2 card is selected */
 .level-card.level-2-card.is-selected .radio-dot::after {
+  content: ""; /* Required for pseudo-element */
+  width: 8px; /* Inner dot diameter */
+  height: 8px; /* Inner dot diameter */
+  border-radius: 50%; /* Circular dot */
   background: var(--level2-bg); /* Deep violet inner dot on white ring */
 }
 
-/* Level card heading */
+/* Level selector heading */
 .level-card-title {
-  font-size: 1.05rem; /* Card title size */
+  font-size: 0.92rem; /* Compact title inside circle */
   font-weight: 900; /* Heavy weight */
   text-transform: uppercase; /* Uppercase */
-  margin-bottom: 4px; /* Small gap below title */
+  margin-bottom: 2px; /* Small gap below title */
 }
 
-/* Level card short description */
+/* Level selector short description */
 .level-card-desc {
-  font-size: 0.84rem; /* Small description */
+  font-size: 0.72rem; /* Compact description inside circle */
+  line-height: 1.25; /* Tight line height */
   color: var(--muted); /* Muted text */
   margin: 0; /* No bottom margin */
 }
 
-/* Light text for description inside selected Level 2 card */
-.level-card.level-2-card.is-selected .level-card-desc {
-  color: rgba(255, 255, 255, 0.82); /* Translucent white */
+/* Light text for description inside selected Level 1 or Level 2 */
+.level-card.is-selected .level-card-desc {
+  color: rgba(255, 255, 255, 0.9); /* Crisp light text on selected circle */
 }
 
 /* Primary full-width pill CTA button */
@@ -727,7 +786,7 @@ h1, h2, h3, p {
   background: #ffffff; /* Bright white surface */
 }
 
-/* Metric tile label */
+/* Metric tile label with "coin" placed on its own line */
 .metric-box label {
   display: block; /* Block label above number */
   font-size: 0.68rem; /* Small uppercase label */
@@ -736,6 +795,13 @@ h1, h2, h3, p {
   text-transform: uppercase; /* Uppercase */
   color: var(--muted); /* Muted color */
   margin-bottom: 2px; /* Small gap before input */
+}
+
+/* Force "coin" part onto its own line inside metric labels */
+.coin-line {
+  display: block; /* New line for "coin" */
+  font-size: 0.65rem; /* Crisp secondary line size */
+  letter-spacing: 0.08em; /* Consistent label tracking */
 }
 
 /* Numeric input inside metric tile */
@@ -757,16 +823,16 @@ h1, h2, h3, p {
   margin-top: 8px; /* Space above message */
 }
 
-/* Highlighted winner card on Results screen */
+/* Highlighted winner card on Results screen with points aligned to the right of name */
 .winner-card {
   background: var(--primary); /* Purple winner card */
   color: #ffffff; /* White text */
   border-radius: var(--radius-lg); /* Rounded card */
-  padding: 20px; /* Inner padding */
-  display: flex; /* Left info + right coin badge */
+  padding: 18px 20px; /* Inner padding */
+  display: flex; /* Left winner name + right score coin */
   align-items: center; /* Vertically center */
-  justify-content: space-between; /* Spread info and score coin */
-  gap: 14px; /* Gap between left and right */
+  justify-content: space-between; /* Place points on the right of winner info */
+  gap: 12px; /* Gap between name and points coin */
   margin-bottom: 14px; /* Space before runners-up */
   box-shadow: 0 14px 30px rgba(101, 40, 255, 0.25); /* Elevation shadow */
 }
@@ -785,8 +851,8 @@ h1, h2, h3, p {
 .winner-name-row {
   display: flex; /* Color dot + name */
   align-items: center; /* Vertically center */
-  gap: 10px; /* Space between dot and name */
-  font-size: 1.8rem; /* Large winner name */
+  gap: 8px; /* Space between dot and name */
+  font-size: 1.55rem; /* Winner name size fitting alongside points */
   font-weight: 900; /* Extra bold */
   font-style: italic; /* Italic display */
   text-transform: uppercase; /* Uppercase */
@@ -795,8 +861,8 @@ h1, h2, h3, p {
 
 /* White-bordered color dot next to winner name */
 .winner-dot {
-  width: 22px; /* Dot diameter */
-  height: 22px; /* Dot diameter */
+  width: 20px; /* Dot diameter */
+  height: 20px; /* Dot diameter */
   border-radius: 50%; /* Full circle */
   border: 3px solid #ffffff; /* White outline */
   flex-shrink: 0; /* Prevent shrinking */
@@ -804,15 +870,15 @@ h1, h2, h3, p {
 
 /* Conversion rate and bonus summary inside winner card */
 .winner-meta {
-  font-size: 0.88rem; /* Meta text size */
+  font-size: 0.84rem; /* Meta text size */
   margin-top: 8px; /* Space above meta */
   opacity: 0.92; /* Slightly softer white */
 }
 
-/* Gold coin medallion displaying total points */
+/* Gold coin medallion displaying total points on the right of winner name */
 .score-coin {
-  width: 88px; /* Coin width */
-  height: 88px; /* Coin height */
+  width: 78px; /* Coin width */
+  height: 78px; /* Coin height */
   border-radius: 50%; /* Circular coin */
   background: var(--gold); /* Gold background */
   color: var(--ink); /* Dark points text */
@@ -827,14 +893,14 @@ h1, h2, h3, p {
 
 /* Total score number inside coin */
 .score-coin strong {
-  font-size: 1.85rem; /* Prominent score */
+  font-size: 1.7rem; /* Prominent score */
   font-weight: 900; /* Extra bold */
   line-height: 1; /* Tight height */
 }
 
 /* "POINTS" caption inside coin */
 .score-coin span {
-  font-size: 0.65rem; /* Small label */
+  font-size: 0.62rem; /* Small label */
   font-weight: 900; /* Heavy weight */
   letter-spacing: 0.1em; /* Tracking */
 }
@@ -1003,9 +1069,36 @@ h1, h2, h3, p {
   color: #ffffff; /* White text */
 }
 
+/* Guide page text styling in crisp black/ink */
+.guide-page,
+.guide-page .screen-title,
+.guide-page .screen-subtitle,
+.guide-page .guide-tap-hint,
+.guide-page .card-row-title,
+.guide-page .row-chevron,
+.guide-page .back-link-btn,
+.guide-page .detail-card-title,
+.guide-page .detail-label,
+.guide-page .detail-effect,
+.guide-page .detail-definition,
+.guide-page .detail-example {
+  color: var(--ink); /* Force black/ink text across card guide */
+}
+
+/* Guide home return link bar */
+.guide-home-link {
+  display: inline-flex; /* Align icon/arrow and label */
+  align-items: center; /* Vertically center */
+  gap: 6px; /* Small gap */
+  font-size: 0.88rem; /* Readable link size */
+  font-weight: 800; /* Bold link */
+  color: var(--ink); /* Black/ink text */
+  margin-bottom: 10px; /* Space above main title */
+}
+
 /* Guide intro prompt text */
 .guide-tap-hint {
-  color: var(--primary); /* Purple hint text matching mockup */
+  color: var(--ink); /* Black/ink hint text */
   font-size: 0.92rem; /* Readable size */
   font-weight: 600; /* Medium-bold */
   margin-bottom: 18px; /* Space before first floor group */
@@ -1117,7 +1210,7 @@ h1, h2, h3, p {
 
 /* Right chevron arrow in card row */
 .row-chevron {
-  color: var(--muted); /* Muted arrow */
+  color: var(--ink); /* Black/ink arrow */
   font-size: 1.1rem; /* Arrow size */
   font-weight: 800; /* Bold arrow */
   line-height: 1; /* Compact line height */
@@ -1128,7 +1221,7 @@ h1, h2, h3, p {
   display: inline-flex; /* Arrow + label */
   align-items: center; /* Vertically center */
   gap: 6px; /* Small space */
-  color: var(--primary); /* Purple text */
+  color: var(--ink); /* Black/ink text */
   font-size: 0.92rem; /* Readable link size */
   font-weight: 700; /* Semi-bold/bold */
   margin-bottom: 14px; /* Space below link */
@@ -1209,13 +1302,13 @@ h1, h2, h3, p {
   margin-top: 0; /* No top margin */
 }
 
-/* Uppercase purple section heading inside detail card */
+/* Uppercase section heading inside detail card */
 .detail-label {
   font-size: 0.75rem; /* Small label */
   font-weight: 900; /* Heavy weight */
   letter-spacing: 0.14em; /* Wide tracking */
   text-transform: uppercase; /* Uppercase */
-  color: var(--primary); /* Purple label */
+  color: var(--ink); /* Black/ink label */
   margin-bottom: 6px; /* Small gap before body text */
 }
 
@@ -1236,6 +1329,18 @@ h1, h2, h3, p {
 /* Example text inside detail card */
 .detail-example {
   font-size: 0.92rem; /* Slightly softer size */
-  color: var(--muted); /* Muted text */
+  color: var(--ink); /* Black/ink example text */
   margin: 0; /* Clean margin */
+}
+
+/* Phone-sized screens: keep header logo at 56px and round level circles sized neatly */
+@media (max-width: 480px) {
+  .brand-logo-only img {
+    height: 56px; /* Prominent mobile header logo height */
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(2, minmax(0, 142px)); /* Fit two round selectors comfortably on narrow phones */
+    gap: 12px; /* Slightly tighter gap on small screens */
+  }
 }

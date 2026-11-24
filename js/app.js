@@ -1,518 +1,562 @@
-// Import game constants and event definitions from data.js
-import { TOTAL_ROUNDS, TOTAL_TOKENS, PLAYER_COLORS, EVENTS } from "./data.js";
+// Import game definitions, funnel stages, events, and scoring helpers
+import {
+  PLAYER_COLORS,
+  LEVEL_CONFIG,
+  TOTAL_ROUNDS,
+  FUNNEL_FLOORS,
+  EVENTS,
+  computePlayerScore,
+  rankPlayers,
+} from "./data.js";
 
-// LocalStorage key used to persist active game state across reloads
-const STORAGE_KEY = "funnelRush.v3.game";
+// LocalStorage persistence key
+const STORAGE_KEY = "funnel_rush_state_v1";
 
-// Shorthand helper to get an element by ID
-const $ = (id) => document.getElementById(id);
-
-// Escape special HTML characters to prevent XSS when inserting dynamic text
-function escapeHTML(str) {
-  return String(str).replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[c]));
+// Build initial default state object
+function createDefaultState() {
+  return {
+    screen: "home", // "home" | "players" | "round" | "scores" | "results"
+    level: 2, // 1 or 2
+    playerCount: 3, // 2, 3, or 4
+    playerNames: ["", "", "", ""], // First names per token color slot
+    round: 1, // 1..6
+    eventDrawn: false, // Whether current round's event has been revealed
+    drawnEventIds: [], // History of drawn event IDs
+    currentEventId: null, // Active event ID in current round
+    scores: [
+      { market: "", interest: "", conversion: "", coins: "", mission: false },
+      { market: "", interest: "", conversion: "", coins: "", mission: false },
+      { market: "", interest: "", conversion: "", coins: "", mission: false },
+      { market: "", interest: "", conversion: "", coins: "", mission: false },
+    ],
+  };
 }
 
-// Load saved game object from localStorage, or return null if absent/invalid
-function loadGame() {
+// Load persisted state from localStorage or fall back to defaults
+function loadState() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return createDefaultState();
+    const parsed = JSON.parse(raw);
+    const base = createDefaultState();
+    return {
+      ...base,
+      ...parsed,
+      level: parsed.level === 1 ? 1 : 2,
+      playerCount: [2, 3, 4].includes(parsed.playerCount) ? parsed.playerCount : 3,
+      playerNames: Array.isArray(parsed.playerNames)
+        ? [0, 1, 2, 3].map((i) => String(parsed.playerNames[i] ?? ""))
+        : base.playerNames,
+      round: Math.min(TOTAL_ROUNDS, Math.max(1, Number(parsed.round) || 1)),
+      drawnEventIds: Array.isArray(parsed.drawnEventIds) ? parsed.drawnEventIds : [],
+      scores: Array.isArray(parsed.scores)
+        ? [0, 1, 2, 3].map((i) => ({
+            ...base.scores[i],
+            ...(parsed.scores[i] || {}),
+          }))
+        : base.scores,
+    };
   } catch {
-    return null;
+    return createDefaultState();
   }
 }
 
-// Save the current game object to localStorage
-function saveGame(game) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(game));
+// Persist current state to localStorage
+function saveState(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Ignore storage quota errors in restricted browsing modes
+  }
 }
 
-// Remove the saved game from localStorage
-function clearGame() {
-  localStorage.removeItem(STORAGE_KEY);
+// Clear persisted game state
+function clearSavedState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
 }
 
-// Draft setup state before a game is persisted
-let draftLevel = 2; // Selected difficulty level (1 or 2)
-let draftCount = 3; // Selected player count (2, 3, or 4)
-let draftNames = ["", "", "", ""]; // Draft player names
+// Application state instance
+let state = loadState();
+// Pending callback for confirmation modal
+let pendingModalAction = null;
 
-// Show only one screen section at a time and hide the rest
-function showOnly(screenId) {
-  ["screen-home", "screen-players", "screen-round", "screen-scores", "screen-results"]
-    .forEach((id) => $(id).classList.toggle("hidden", id !== screenId));
+// Cache DOM references
+const els = {
+  screens: {
+    home: document.getElementById("screen-home"),
+    players: document.getElementById("screen-players"),
+    round: document.getElementById("screen-round"),
+    scores: document.getElementById("screen-scores"),
+    results: document.getElementById("screen-results"),
+  },
+  levelCards: [...document.querySelectorAll(".level-card")],
+  btnNewGame: document.getElementById("btn-new-game"),
+  playersLevelBadge: document.getElementById("players-level-badge"),
+  countBtns: [...document.querySelectorAll(".count-btn")],
+  playerInputs: document.getElementById("player-inputs"),
+  playersError: document.getElementById("players-error"),
+  btnStartGame: document.getElementById("btn-start-game"),
+  roundLevelBadge: document.getElementById("round-level-badge"),
+  roundEyebrow: document.getElementById("round-eyebrow"),
+  roundCounter: document.getElementById("round-counter"),
+  roundBars: document.getElementById("round-bars"),
+  eventSlot: document.getElementById("event-slot"),
+  btnRoundAction: document.getElementById("btn-round-action"),
+  scoresLevelBadge: document.getElementById("scores-level-badge"),
+  scoresSubtitle: document.getElementById("scores-subtitle"),
+  scoresForm: document.getElementById("scores-form"),
+  scoreCards: document.getElementById("score-cards"),
+  resultsLevelBadge: document.getElementById("results-level-badge"),
+  winnerBanner: document.getElementById("winner-banner"),
+  runnersList: document.getElementById("runners-list"),
+  btnResultsNewGame: document.getElementById("btn-results-new-game"),
+  modalRound: document.getElementById("modal-round"),
+  modalRoundTitle: document.getElementById("modal-round-title"),
+  modalRoundDesc: document.getElementById("modal-round-desc"),
+  modalRoundCancel: document.getElementById("modal-round-cancel"),
+  modalRoundConfirm: document.getElementById("modal-round-confirm"),
+  modalReset: document.getElementById("modal-reset"),
+  modalResetCancel: document.getElementById("modal-reset-cancel"),
+  modalResetConfirm: document.getElementById("modal-reset-confirm"),
+};
+
+// Apply level styling to any header badge
+function applyLevelBadge(badgeEl, level) {
+  if (!badgeEl) return;
+  badgeEl.textContent = `Level ${level}`;
+  badgeEl.classList.toggle("is-level-1", level === 1);
+  badgeEl.classList.toggle("is-level-2", level === 2);
 }
 
-// Update a level badge element's text and style class
-function applyLevelBadge(el, level) {
-  el.textContent = `Level ${level}`;
-  el.classList.toggle("is-level-1", level === 1);
-  el.classList.toggle("is-level-2", level === 2);
+// Show only the target screen and save state
+function showScreen(screenName) {
+  state.screen = screenName;
+  saveState(state);
+  Object.entries(els.screens).forEach(([key, section]) => {
+    section.classList.toggle("hidden", key !== screenName);
+  });
+  renderCurrentScreen();
 }
 
-// Pick a random event allowed by the game level without repeating the previous event
-function pickNextEvent(level, lastEventId) {
-  const pool = EVENTS.filter((ev) => ev.level <= level && ev.id !== lastEventId);
-  const candidates = pool.length ? pool : EVENTS.filter((ev) => ev.level <= level);
-  return candidates[Math.floor(Math.random() * candidates.length)].id;
-}
-
-/* --- 1. HOME SCREEN --- */
-
-// Sync visual selection state on the Level 1 and Level 2 cards
-function syncHomeSelection() {
-  document.querySelectorAll(".level-card[data-level]").forEach((btn) => {
-    const selected = Number(btn.dataset.level) === draftLevel;
-    btn.classList.toggle("is-selected", selected);
-    btn.setAttribute("aria-pressed", String(selected));
+// Render home level selection cards
+function renderHome() {
+  els.levelCards.forEach((card) => {
+    const lvl = Number(card.dataset.level);
+    const selected = state.level === lvl;
+    card.classList.toggle("is-selected", selected);
+    card.setAttribute("aria-pressed", String(selected));
   });
 }
 
-// Listen for clicks on Level 1 / Level 2 cards
-document.querySelectorAll(".level-card[data-level]").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    draftLevel = Number(btn.dataset.level);
-    syncHomeSelection();
-  });
-});
-
-// Move to the Players setup screen when clicking "New game"
-$("btn-new-game").addEventListener("click", () => {
-  draftCount = 3;
-  renderPlayersScreen();
-  showOnly("screen-players");
-});
-
-/* --- 2. PLAYERS SCREEN --- */
-
-// Render the player count buttons and name input rows
-function renderPlayersScreen() {
-  applyLevelBadge($("players-level-badge"), draftLevel);
-
-  document.querySelectorAll(".count-btn[data-count]").forEach((btn) => {
-    btn.classList.toggle("is-active", Number(btn.dataset.count) === draftCount);
+// Render player setup inputs based on playerCount
+function renderPlayers() {
+  applyLevelBadge(els.playersLevelBadge, state.level);
+  els.countBtns.forEach((btn) => {
+    btn.classList.toggle("is-active", Number(btn.dataset.count) === state.playerCount);
   });
 
-  $("player-inputs").innerHTML = Array.from({ length: draftCount }, (_, idx) => {
-    const color = PLAYER_COLORS[idx] || PLAYER_COLORS[0];
-    const val = draftNames[idx] || "";
-    return `
-      <div class="player-name-row">
-        <span class="token-swatch" style="background:${color}"></span>
-        <input
-          class="name-input"
-          type="text"
-          maxlength="24"
-          data-player-index="${idx}"
-          placeholder="First name"
-          value="${escapeHTML(val)}"
-          autocomplete="off"
-        >
-      </div>
-    `;
-  }).join("");
+  els.playerInputs.innerHTML = "";
+  for (let i = 0; i < state.playerCount; i += 1) {
+    const color = PLAYER_COLORS[i];
+    const row = document.createElement("div");
+    row.className = "player-name-row";
 
-  $("players-error").classList.add("hidden");
-  $("players-error").textContent = "";
-}
+    const swatch = document.createElement("span");
+    swatch.className = "token-swatch";
+    swatch.style.background = color.hex;
+    swatch.title = color.name;
 
-// Preserve typed names and switch active player count (2, 3, or 4)
-document.querySelectorAll(".count-btn[data-count]").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".name-input[data-player-index]").forEach((inp) => {
-      draftNames[Number(inp.dataset.playerIndex)] = inp.value;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "name-input";
+    input.placeholder = `Player ${i + 1} (${color.name})`;
+    input.maxLength = 20;
+    input.value = state.playerNames[i] || "";
+    input.dataset.index = String(i);
+
+    input.addEventListener("input", (e) => {
+      const idx = Number(e.target.dataset.index);
+      state.playerNames[idx] = e.target.value;
+      els.playersError.classList.add("hidden");
+      saveState(state);
     });
-    draftCount = Number(btn.dataset.count);
-    renderPlayersScreen();
-  });
-});
 
-// Create and save a new game at Round 1, then render the Round screen
-$("btn-start-game").addEventListener("click", () => {
-  const inputs = Array.from(document.querySelectorAll(".name-input[data-player-index]"));
-  const players = inputs.map((inp, idx) => ({
-    name: inp.value.trim() || `Player ${idx + 1}`,
-    color: PLAYER_COLORS[idx] || PLAYER_COLORS[0],
-    loyalty: 0,
-    conversion: 0,
-    coins: 0,
-    market: 0,
-    mission: false
-  }));
-
-  const game = {
-    level: draftLevel,
-    round: 1,
-    eventId: null,
-    lastEventId: null,
-    phase: "round",
-    players
-  };
-  saveGame(game);
-  render();
-});
-
-/* --- 3. ROUND SCREEN --- */
-
-// Compute the label for the single round button based on current state
-function getRoundButtonLabel(game) {
-  if (!game.eventId) return `Round ${game.round}: draw event`;
-  if (game.round < TOTAL_ROUNDS) return "Next round: draw event";
-  return "End game: calculate scores";
+    row.append(swatch, input);
+    els.playerInputs.appendChild(row);
+  }
 }
 
-// Render the round counter, progress bars, event card/placeholder, and action button
-function renderRoundScreen(game) {
-  applyLevelBadge($("round-level-badge"), game.level);
+// Pick a random event card for the current round
+function pickRandomEvent() {
+  const unused = EVENTS.filter((ev) => !state.drawnEventIds.includes(ev.id));
+  const pool = unused.length > 0 ? unused : EVENTS;
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  state.currentEventId = chosen.id;
+  state.eventDrawn = true;
+  if (!state.drawnEventIds.includes(chosen.id)) {
+    state.drawnEventIds.push(chosen.id);
+  }
+  saveState(state);
+  return chosen;
+}
 
-  const isFinalRound = game.round === TOTAL_ROUNDS;
-  $("round-eyebrow").textContent = isFinalRound ? "Final round" : "Round";
-  $("round-eyebrow").classList.toggle("is-final", isFinalRound);
-  $("round-counter").textContent = `${game.round}/${TOTAL_ROUNDS}`;
+// Render round progress and event card slot
+function renderRound() {
+  applyLevelBadge(els.roundLevelBadge, state.level);
+  const isFinal = state.round === TOTAL_ROUNDS;
 
-  $("round-bars").innerHTML = Array.from({ length: TOTAL_ROUNDS }, (_, i) => {
-    const done = i < game.round;
-    const cls = ["round-bar"];
-    if (done) cls.push(isFinalRound ? "is-final" : "is-done");
-    return `<span class="${cls.join(" ")}"></span>`;
-  }).join("");
+  els.roundEyebrow.textContent = isFinal ? "Final round" : "Round";
+  els.roundEyebrow.classList.toggle("is-final", isFinal);
+  els.roundCounter.textContent = `${state.round}/${TOTAL_ROUNDS}`;
 
-  const currentEvent = EVENTS.find((e) => e.id === game.eventId);
-  if (!currentEvent) {
-    $("event-slot").innerHTML = `
+  els.roundBars.innerHTML = "";
+  for (let r = 1; r <= TOTAL_ROUNDS; r += 1) {
+    const bar = document.createElement("span");
+    bar.className = "round-bar";
+    if (r <= state.round) {
+      bar.classList.add(isFinal && r === TOTAL_ROUNDS ? "is-final" : "is-done");
+    }
+    els.roundBars.appendChild(bar);
+  }
+
+  if (!state.eventDrawn) {
+    els.eventSlot.innerHTML = `
       <div class="event-placeholder">
         <div class="q-badge">?</div>
-        <p class="eyebrow" style="margin-bottom:8px;">Round event</p>
-        <p style="font-weight:800;font-size:1.05rem;margin-bottom:6px;">This round's event will appear here.</p>
-        <p style="color:var(--muted);font-size:0.9rem;margin:0;">Everyone ready? Draw the first event.</p>
+        <p class="screen-subtitle" style="margin-bottom:0;">Draw this round's event card when everyone is ready.</p>
       </div>
     `;
+    els.btnRoundAction.textContent = `Round ${state.round}: draw event`;
   } else {
-    $("event-slot").innerHTML = `
-      <article class="event-card-box">
+    const ev = EVENTS.find((item) => item.id === state.currentEventId) || EVENTS[0];
+    const floor = FUNNEL_FLOORS[ev.floor] || { label: ev.floor };
+    els.eventSlot.innerHTML = `
+      <div class="event-card-box">
         <div class="event-card-head">
-          <span>Round event</span>
+          <span>Event · ${floor.label}</span>
           <span class="event-excl">!</span>
         </div>
         <div class="event-card-body">
-          <h2 class="event-title">${escapeHTML(currentEvent.name)}</h2>
-          <p class="event-effect">${escapeHTML(currentEvent.effect)}</p>
-          <p class="event-footer-tip">Read it out loud. It applies to all players for this round only.</p>
+          <h2 class="event-title">${ev.title}</h2>
+          <p class="event-effect">${ev.effect}</p>
+          <p class="event-footer-tip">Apply this effect during Round ${state.round}, then advance when everyone has played.</p>
         </div>
-      </article>
+      </div>
     `;
+    els.btnRoundAction.textContent = isFinal ? "Finish game & enter scores" : `Next round (${state.round + 1}/${TOTAL_ROUNDS})`;
   }
-
-  const btn = $("btn-round-action");
-  btn.textContent = getRoundButtonLabel(game);
-  btn.classList.toggle("is-gold", Boolean(currentEvent) && isFinalRound);
 }
 
-// Store callback for the active confirmation modal
-let pendingRoundAction = null;
+// Render score entry cards for active players
+function renderScores() {
+  applyLevelBadge(els.scoresLevelBadge, state.level);
+  els.scoresSubtitle.textContent =
+    state.level === 2
+      ? "Count your tokens on the board, enter the numbers, then check completed missions (+5 pts)."
+      : "Count your tokens on the board and enter the numbers for each player.";
 
-// Open the round confirmation modal
-function openRoundModal(title, desc, onConfirm) {
-  pendingRoundAction = onConfirm;
-  $("modal-round-title").textContent = title;
-  $("modal-round-desc").textContent = desc;
-  $("modal-round").classList.remove("hidden");
-}
+  els.scoreCards.innerHTML = "";
+  for (let i = 0; i < state.playerCount; i += 1) {
+    const color = PLAYER_COLORS[i];
+    const name = (state.playerNames[i] || "").trim() || `Player ${i + 1}`;
+    const sc = state.scores[i];
 
-// Close the round confirmation modal
-function closeRoundModal() {
-  pendingRoundAction = null;
-  $("modal-round").classList.add("hidden");
-}
+    const card = document.createElement("div");
+    card.className = "score-card";
+    card.dataset.playerIndex = String(i);
 
-// Cancel button inside round modal
-$("modal-round-cancel").addEventListener("click", closeRoundModal);
+    const missionHtml =
+      state.level === 2
+        ? `
+          <label class="mission-toggle ${sc.mission ? "is-checked" : ""}">
+            <input type="checkbox" data-field="mission" ${sc.mission ? "checked" : ""}>
+            <span>Mission +5</span>
+          </label>
+        `
+        : "";
 
-// Confirm button inside round modal
-$("modal-round-confirm").addEventListener("click", () => {
-  const fn = pendingRoundAction;
-  closeRoundModal();
-  if (typeof fn === "function") fn();
-});
-
-// Handle primary round button: draw current round event, advance round, or go to scores
-$("btn-round-action").addEventListener("click", () => {
-  const game = loadGame();
-  if (!game) return;
-
-  // First click in a round draws the event immediately without confirmation
-  if (!game.eventId) {
-    game.eventId = pickNextEvent(game.level, game.lastEventId);
-    saveGame(game);
-    renderRoundScreen(game);
-    return;
-  }
-
-  // Advance to next round (1..5 -> 2..6) after confirmation
-  if (game.round < TOTAL_ROUNDS) {
-    const nextRoundNum = game.round + 1;
-    openRoundModal(
-      "Everyone played?",
-      `A new event will be drawn for round ${nextRoundNum}.`,
-      () => {
-        game.round = nextRoundNum;
-        game.lastEventId = game.eventId;
-        game.eventId = pickNextEvent(game.level, game.lastEventId);
-        saveGame(game);
-        renderRoundScreen(game);
-      }
-    );
-  } else {
-    // After round 6, transition to the final scores screen after confirmation
-    openRoundModal(
-      "Everyone played?",
-      "Round 6 is complete: moving to final score entry.",
-      () => {
-        game.phase = "scores";
-        saveGame(game);
-        render();
-      }
-    );
-  }
-});
-
-/* --- 4. FINAL SCORES SCREEN --- */
-
-// Render final score cards for each player (with Mission +5 toggle in Level 2)
-function renderScoresScreen(game) {
-  applyLevelBadge($("scores-level-badge"), game.level);
-  $("scores-subtitle").textContent = game.level === 2
-    ? "Count your tokens on the board, enter the numbers, then check completed missions."
-    : "Count your tokens on the board and enter the numbers for each player.";
-
-  $("score-cards").innerHTML = game.players.map((p, idx) => {
-    const missionHtml = game.level === 2 ? `
-      <label class="mission-toggle ${p.mission ? "is-checked" : ""}" data-mission-label="${idx}">
-        <input type="checkbox" id="m-${idx}" ${p.mission ? "checked" : ""}>
-        <span>Mission +5</span>
-      </label>
-    ` : "";
-
-    return `
-      <article class="score-card" id="score-card-${idx}">
-        <div class="score-card-head">
-          <div class="player-ident">
-            <span class="token-swatch" style="background:${p.color}"></span>
-            <span>${escapeHTML(p.name)}</span>
-          </div>
-          ${missionHtml}
+    card.innerHTML = `
+      <div class="score-card-head">
+        <div class="player-ident">
+          <span class="token-swatch" style="background:${color.hex};width:20px;height:20px;border-width:3px;"></span>
+          <span>${name}</span>
         </div>
-        <div class="metrics-grid">
-          <div class="metric-box">
-            <label for="loyalty-${idx}">Loyalty</label>
-            <input type="number" min="0" max="30" step="1" id="loyalty-${idx}" value="${p.loyalty || ""}" placeholder="-">
-          </div>
-          <div class="metric-box">
-            <label for="conversion-${idx}">Conversion</label>
-            <input type="number" min="0" max="30" step="1" id="conversion-${idx}" value="${p.conversion || ""}" placeholder="-">
-          </div>
-          <div class="metric-box is-gold">
-            <label for="coins-${idx}">Coins left</label>
-            <input type="number" min="0" step="1" id="coins-${idx}" value="${p.coins || ""}" placeholder="-">
-          </div>
-          <div class="metric-box is-dark">
-            <label for="market-${idx}">Market tokens</label>
-            <input type="number" min="0" max="30" step="1" id="market-${idx}" value="${p.market || ""}" placeholder="-">
-          </div>
+        ${missionHtml}
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-box is-dark">
+          <label>Market tokens<br><span class="coin-line">board</span></label>
+          <input type="number" min="0" step="1" inputmode="numeric" data-field="market" value="${sc.market}">
         </div>
-        <p id="score-err-${idx}" class="error-text hidden"></p>
-      </article>
+        <div class="metric-box">
+          <label>Interest tokens<br><span class="coin-line">funnel</span></label>
+          <input type="number" min="0" step="1" inputmode="numeric" data-field="interest" value="${sc.interest}">
+        </div>
+        <div class="metric-box">
+          <label>Conversion tokens<br><span class="coin-line">customers</span></label>
+          <input type="number" min="0" step="1" inputmode="numeric" data-field="conversion" value="${sc.conversion}">
+        </div>
+        <div class="metric-box is-gold">
+          <label>Remaining<br><span class="coin-line">coins</span></label>
+          <input type="number" min="0" step="1" inputmode="numeric" data-field="coins" value="${sc.coins}">
+        </div>
+      </div>
+      <p class="error-text hidden" data-role="card-error"></p>
     `;
-  }).join("");
 
-  // Toggle active pill styling when Mission +5 checkbox changes
-  document.querySelectorAll("[data-mission-label]").forEach((lbl) => {
-    const chk = lbl.querySelector('input[type="checkbox"]');
-    chk.addEventListener("change", () => {
-      lbl.classList.toggle("is-checked", chk.checked);
+    card.querySelectorAll("input").forEach((inp) => {
+      inp.addEventListener("input", () => {
+        const field = inp.dataset.field;
+        if (field === "mission") {
+          state.scores[i].mission = inp.checked;
+          inp.closest(".mission-toggle")?.classList.toggle("is-checked", inp.checked);
+        } else {
+          state.scores[i][field] = inp.value;
+        }
+        card.classList.remove("has-error");
+        const errEl = card.querySelector('[data-role="card-error"]');
+        if (errEl) errEl.classList.add("hidden");
+        saveState(state);
+      });
     });
-  });
+
+    els.scoreCards.appendChild(card);
+  }
 }
 
-// Parse a non-negative integer field (empty input defaults to 0)
-function parseNonNegInt(raw) {
-  if (raw === "" || raw === null || raw === undefined) return 0;
-  if (!/^\d+$/.test(String(raw).trim())) return NaN;
-  return Number(raw);
-}
+// Render final winner banner and ranked runners-up
+function renderResults() {
+  applyLevelBadge(els.resultsLevelBadge, state.level);
 
-// Validate inputs, save final player figures, and switch to Results screen
-$("scores-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const game = loadGame();
-  if (!game) return;
+  const activePlayers = [];
+  for (let i = 0; i < state.playerCount; i += 1) {
+    const color = PLAYER_COLORS[i];
+    const name = (state.playerNames[i] || "").trim() || `Player ${i + 1}`;
+    const sc = state.scores[i];
+    const breakdown = computePlayerScore(sc, state.level);
+    activePlayers.push({
+      index: i,
+      name,
+      color,
+      ...breakdown,
+    });
+  }
 
-  let hasError = false;
-  const updatedPlayers = game.players.map((p, idx) => {
-    const card = $(`score-card-${idx}`);
-    const errEl = $(`score-err-${idx}`);
-    card.classList.remove("has-error");
-    errEl.classList.add("hidden");
-    errEl.textContent = "";
+  const ranked = rankPlayers(activePlayers);
+  const winner = ranked[0];
+  const runners = ranked.slice(1);
 
-    const loyalty = parseNonNegInt($(`loyalty-${idx}`).value);
-    const conversion = parseNonNegInt($(`conversion-${idx}`).value);
-    const coins = parseNonNegInt($(`coins-${idx}`).value);
-    const market = parseNonNegInt($(`market-${idx}`).value);
-    const mission = game.level === 2 ? Boolean($(`m-${idx}`)?.checked) : false;
+  if (!winner) return;
 
-    let msg = "";
-    if ([loyalty, conversion, coins, market].some((n) => Number.isNaN(n) || n < 0)) {
-      msg = "Please enter whole numbers greater than or equal to zero.";
-    } else if (market > TOTAL_TOKENS) {
-      msg = `Market tokens cannot exceed ${TOTAL_TOKENS}.`;
-    } else if (loyalty + conversion > TOTAL_TOKENS - market) {
-      msg = `Loyalty + Conversion (${loyalty + conversion}) cannot exceed entered prospects (${TOTAL_TOKENS - market}).`;
-    }
-
-    if (msg) {
-      hasError = true;
-      card.classList.add("has-error");
-      errEl.textContent = msg;
-      errEl.classList.remove("hidden");
-    }
-
-    return { ...p, loyalty, conversion, coins, market, mission };
-  });
-
-  if (hasError) return;
-
-  game.players = updatedPlayers;
-  game.phase = "results";
-  saveGame(game);
-  render();
-});
-
-/* --- 5. RESULTS SCREEN --- */
-
-// Calculate conversion rates, bonuses, mission points, and sorted standings
-function computeStandings(game) {
-  const rated = game.players.map((p) => {
-    const entered = TOTAL_TOKENS - p.market;
-    const customers = p.loyalty + p.conversion;
-    const rate = entered > 0 ? customers / entered : 0;
-    return { ...p, rate };
-  });
-
-  const bestRate = Math.max(...rated.map((p) => p.rate));
-
-  return rated
-    .map((p) => {
-      const hasBonus = bestRate > 0 && Math.abs(p.rate - bestRate) < 1e-9;
-      const bonus = hasBonus ? 3 : 0;
-      const missionPts = game.level === 2 && p.mission ? 5 : 0;
-      const pts = 3 * p.loyalty + 2 * p.conversion + Math.floor(p.coins / 5) + bonus + missionPts;
-      return { ...p, hasBonus, bonus, missionPts, pts };
-    })
-    .sort((a, b) => b.pts - a.pts || b.rate - a.rate);
-}
-
-// Render winner banner and runner-up cards
-function renderResultsScreen(game) {
-  applyLevelBadge($("results-level-badge"), game.level);
-  const standings = computeStandings(game);
-  const topScore = standings[0]?.pts ?? 0;
-  const winners = standings.filter((p) => p.pts === topScore);
-  const mainWinner = winners[0];
-
-  const winnerLabel = winners.length > 1
-    ? winners.map((w) => escapeHTML(w.name)).join(" & ")
-    : escapeHTML(mainWinner.name);
-
-  $("winner-banner").innerHTML = `
-    <div>
-      <div class="winner-eyebrow">${winners.length > 1 ? "Tie · Winners" : "Winner"}</div>
-      <div class="winner-name-row">
-        <span class="winner-dot" style="background:${mainWinner.color}"></span>
-        <span>${winnerLabel}</span>
+  const ratePct = Math.round(winner.conversionRate * 100);
+  els.winnerBanner.innerHTML = `
+    <div class="winner-card">
+      <div>
+        <div class="winner-eyebrow">Winner</div>
+        <div class="winner-name-row">
+          <span class="winner-dot" style="background:${winner.color.hex};"></span>
+          <span>${winner.name}</span>
+        </div>
+        <div class="winner-meta">
+          Conversion: ${ratePct}%${winner.hasConversionBonus ? " · +3 rate bonus" : ""}
+        </div>
       </div>
-      <div class="winner-meta">
-        Conversion rate ${Math.round(mainWinner.rate * 100)}%
-        ${mainWinner.missionPts ? `<br>Mission completed +${mainWinner.missionPts}` : ""}
-        ${mainWinner.hasBonus ? `<br>Best rate +${mainWinner.bonus}` : ""}
+      <div class="score-coin">
+        <strong>${winner.totalPoints}</strong>
+        <span>POINTS</span>
       </div>
-    </div>
-    <div class="score-coin">
-      <strong>${mainWinner.pts}</strong>
-      <span>POINTS</span>
     </div>
   `;
 
-  $("runners-list").innerHTML = standings.slice(1).map((p, idx) => `
-    <article class="runner-up-card">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span class="rank-badge" style="background:${p.color}">${idx + 2}</span>
-        <div>
-          <div class="runner-title">${escapeHTML(p.name)}</div>
-          <div class="runner-sub">
-            Loyalty ${p.loyalty} · Conversion ${p.conversion} · Coins ${p.coins}
-            ${p.missionPts ? " · Mission +5" : ""}
-            ${p.hasBonus ? " · Bonus +3" : ""}
+  els.runnersList.innerHTML = runners
+    .map((p, idx) => {
+      const rankNum = idx + 2;
+      const pct = Math.round(p.conversionRate * 100);
+      return `
+        <div class="runner-up-card">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="rank-badge" style="background:${p.color.hex};">${rankNum}</span>
+            <div>
+              <div class="runner-title">${p.name}</div>
+              <div class="runner-sub">Conv. ${pct}%${p.hasConversionBonus ? " · +3 bonus" : ""}${p.missionBonus ? " · +5 mission" : ""}</div>
+            </div>
           </div>
+          <div class="runner-pts">${p.totalPoints} pts</div>
         </div>
-      </div>
-      <div class="runner-pts">${p.pts} PTS</div>
-    </article>
-  `).join("");
+      `;
+    })
+    .join("");
 }
 
-/* --- ERASE GAME MODAL --- */
-
-// Show erase confirmation dialog
-function openResetModal() {
-  $("modal-reset").classList.remove("hidden");
+// Dispatch rendering for active screen
+function renderCurrentScreen() {
+  renderHome();
+  if (state.screen === "players") renderPlayers();
+  if (state.screen === "round") renderRound();
+  if (state.screen === "scores") renderScores();
+  if (state.screen === "results") renderResults();
 }
 
-// Hide erase confirmation dialog
-function closeResetModal() {
-  $("modal-reset").classList.add("hidden");
+// Open confirmation modal
+function openModal(modalEl, title, desc, onConfirm) {
+  pendingModalAction = onConfirm;
+  if (title && els.modalRoundTitle && modalEl === els.modalRound) {
+    els.modalRoundTitle.textContent = title;
+  }
+  if (desc && els.modalRoundDesc && modalEl === els.modalRound) {
+    els.modalRoundDesc.textContent = desc;
+  }
+  modalEl.classList.remove("hidden");
 }
 
-// Open modal from Results "New game" button
-$("btn-results-new-game").addEventListener("click", openResetModal);
+// Close confirmation modal
+function closeModal(modalEl) {
+  modalEl.classList.add("hidden");
+  pendingModalAction = null;
+}
 
-// Close modal on Cancel
-$("modal-reset-cancel").addEventListener("click", closeResetModal);
-
-// Clear saved game and return to Home screen on Erase
-$("modal-reset-confirm").addEventListener("click", () => {
-  closeResetModal();
-  clearGame();
-  draftNames = ["", "", "", ""];
-  render();
+// Level selection handlers on home screen
+els.levelCards.forEach((card) => {
+  card.addEventListener("click", () => {
+    state.level = Number(card.dataset.level) === 1 ? 1 : 2;
+    saveState(state);
+    renderHome();
+  });
 });
 
-// Router: choose which screen to display based on saved game state
-function render() {
-  const game = loadGame();
-  if (!game) {
-    syncHomeSelection();
-    showOnly("screen-home");
-    return;
-  }
-  if (game.phase === "scores") {
-    renderScoresScreen(game);
-    showOnly("screen-scores");
-    return;
-  }
-  if (game.phase === "results") {
-    renderResultsScreen(game);
-    showOnly("screen-results");
-    return;
-  }
-  renderRoundScreen(game);
-  showOnly("screen-round");
-}
+// Start new game setup from home screen
+els.btnNewGame.addEventListener("click", () => {
+  const cfg = LEVEL_CONFIG[state.level];
+  state.scores = [0, 1, 2, 3].map(() => ({
+    market: "",
+    interest: "",
+    conversion: "",
+    coins: String(cfg.startingCoins),
+    mission: false,
+  }));
+  showScreen("players");
+});
 
-// Initial render on page load
-render();
+// Player count switcher handlers
+els.countBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    state.playerCount = Number(btn.dataset.count);
+    els.playersError.classList.add("hidden");
+    saveState(state);
+    renderPlayers();
+  });
+});
+
+// Start round 1 from players screen
+els.btnStartGame.addEventListener("click", () => {
+  const inputs = [...els.playerInputs.querySelectorAll(".name-input")];
+  const names = inputs.map((inp) => inp.value.trim());
+  if (names.some((n) => n.length === 0)) {
+    els.playersError.textContent = "Please enter a first name for every player.";
+    els.playersError.classList.remove("hidden");
+    return;
+  }
+  names.forEach((n, idx) => {
+    state.playerNames[idx] = n;
+  });
+  state.round = 1;
+  state.eventDrawn = false;
+  state.drawnEventIds = [];
+  state.currentEventId = null;
+  saveState(state);
+  showScreen("round");
+});
+
+// Round action button: draw event or advance round / finish game
+els.btnRoundAction.addEventListener("click", () => {
+  if (!state.eventDrawn) {
+    pickRandomEvent();
+    renderRound();
+    return;
+  }
+
+  if (state.round < TOTAL_ROUNDS) {
+    openModal(
+      els.modalRound,
+      "Everyone played?",
+      `Advance from Round ${state.round}/${TOTAL_ROUNDS} to Round ${state.round + 1}/${TOTAL_ROUNDS}?`,
+      () => {
+        state.round += 1;
+        state.eventDrawn = false;
+        state.currentEventId = null;
+        saveState(state);
+        renderRound();
+      }
+    );
+  } else {
+    openModal(
+      els.modalRound,
+      "Finish game?",
+      "All 6 rounds are complete. Enter final scores now?",
+      () => {
+        showScreen("scores");
+      }
+    );
+  }
+});
+
+// Validate and submit final scores form
+els.scoresForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  let allValid = true;
+
+  for (let i = 0; i < state.playerCount; i += 1) {
+    const card = els.scoreCards.querySelector(`.score-card[data-player-index="${i}"]`);
+    const errEl = card?.querySelector('[data-role="card-error"]');
+    const sc = state.scores[i];
+
+    const values = [sc.market, sc.interest, sc.conversion, sc.coins];
+    const invalid = values.some((v) => v === "" || Number.isNaN(Number(v)) || Number(v) < 0);
+
+    if (invalid) {
+      allValid = false;
+      card?.classList.add("has-error");
+      if (errEl) {
+        errEl.textContent = "Enter a valid non-negative number for each field.";
+        errEl.classList.remove("hidden");
+      }
+    } else {
+      card?.classList.remove("has-error");
+      if (errEl) errEl.classList.add("hidden");
+    }
+  }
+
+  if (!allValid) return;
+  showScreen("results");
+});
+
+// Open reset confirmation modal from results screen
+els.btnResultsNewGame.addEventListener("click", () => {
+  openModal(els.modalReset, "Erase game?", "Scores will be deleted from this device.", () => {
+    clearSavedState();
+    state = createDefaultState();
+    showScreen("home");
+  });
+});
+
+// Modal button listeners
+els.modalRoundCancel.addEventListener("click", () => closeModal(els.modalRound));
+els.modalRoundConfirm.addEventListener("click", () => {
+  const fn = pendingModalAction;
+  closeModal(els.modalRound);
+  if (typeof fn === "function") fn();
+});
+
+els.modalResetCancel.addEventListener("click", () => closeModal(els.modalReset));
+els.modalResetConfirm.addEventListener("click", () => {
+  const fn = pendingModalAction;
+  closeModal(els.modalReset);
+  if (typeof fn === "function") fn();
+});
+
+// Initial render on load
+renderCurrentScreen();
