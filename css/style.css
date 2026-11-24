@@ -48,6 +48,8 @@ button {
   cursor: pointer; /* Show pointer cursor on interactive buttons */
   border: 0; /* Remove default border */
   background: none; /* Remove default background */
+  position: relative; /* Keep button stacking clean */
+  z-index: 2; /* Ensure buttons sit above decorative pseudo-elements */
 }
 
 /* Keep links clean when styled as buttons or nav actions */
@@ -82,11 +84,12 @@ a {
   margin-bottom: 20px; /* Space below top bar */
 }
 
-/* Right cluster inside header (e.g. Back to game + 15 CARDS badge) */
+/* Right cluster inside header (Back to game above 15 CARDS badge) */
 .header-actions {
-  display: inline-flex; /* Align buttons/badges horizontally */
-  align-items: center; /* Vertically center items */
-  gap: 8px; /* Space between action and badge */
+  display: inline-flex; /* Align items cleanly */
+  flex-direction: column; /* Stack Back to game right above 15 CARDS badge */
+  align-items: flex-end; /* Align neatly to the right edge */
+  gap: 6px; /* Space between button and badge */
   flex-shrink: 0; /* Prevent wrapping/squishing */
 }
 
@@ -95,12 +98,12 @@ a {
   display: inline-flex; /* Inline pill button */
   align-items: center; /* Vertically center label */
   justify-content: center; /* Center label */
-  padding: 7px 13px; /* Compact pill padding */
+  padding: 6px 12px; /* Compact pill padding */
   border-radius: var(--radius-pill); /* Pill shape */
   background: var(--surface); /* White background */
   color: var(--ink); /* Black/ink text */
   border: 2px solid var(--line); /* Soft border */
-  font-size: 0.74rem; /* Compact uppercase font */
+  font-size: 0.72rem; /* Compact uppercase font */
   font-weight: 900; /* Heavy weight */
   letter-spacing: 0.06em; /* Slight letter spacing */
   text-transform: uppercase; /* Uppercase */
@@ -217,46 +220,39 @@ h1, h2, h3, p {
   margin-bottom: 12px; /* Space before cards */
 }
 
-/* Two-column grid for round Level 1 and Level 2 selectors */
+/* Two-column grid for Level 1 and Level 2 cards (classic card shape) */
 .level-grid {
   display: grid; /* CSS grid */
-  grid-template-columns: repeat(2, minmax(0, 156px)); /* Two balanced circular level columns */
-  justify-content: center; /* Center the pair on the home screen */
-  gap: 16px; /* Gap between round level buttons */
-  margin-bottom: 20px; /* Space below level selectors */
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  gap: 14px; /* Gap between cards */
+  margin-bottom: 20px; /* Space below cards */
 }
 
-/* Round level selector button */
+/* Individual level option card */
 .level-card {
   position: relative; /* Positioning context */
-  width: 100%; /* Fill grid cell */
-  aspect-ratio: 1 / 1; /* Keep round/circular shape */
-  border-radius: 50%; /* Full circle */
-  text-align: center; /* Center content inside circle */
-  padding: 16px 14px; /* Inner circular padding */
+  text-align: left; /* Left-align text inside card */
+  border-radius: var(--radius-lg); /* Rounded card corners */
+  padding: 18px 16px; /* Inner card padding */
   background: var(--surface); /* White background */
-  border: 2.5px solid var(--line); /* Default border */
-  display: flex; /* Flex column inside circle */
-  flex-direction: column; /* Stack number, title, description */
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; /* Smooth transitions */
+  border: 2px solid var(--line); /* Default border */
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; /* Smooth state transitions */
 }
 
-/* Press feedback on level button */
+/* Press feedback on level card */
 .level-card:active {
-  transform: scale(0.97); /* Subtle press shrink */
+  transform: scale(0.98); /* Subtle press shrink */
 }
 
-/* Blue selected state for Level 1 round button */
+/* Blue selected state for Level 1 card */
 .level-card[data-level="1"].is-selected {
   background: var(--blue-selected); /* Blue fill when Level 1 is selected */
   border-color: var(--blue-selected); /* Matching blue border */
-  color: #ffffff; /* White text for contrast */
-  box-shadow: 0 12px 26px rgba(29, 111, 242, 0.28); /* Blue elevation */
+  color: #ffffff; /* White text */
+  box-shadow: 0 10px 24px rgba(29, 111, 242, 0.25); /* Blue elevation */
 }
 
-/* Active selected state for Level 2 round button */
+/* Active selected state for Level 2 card */
 .level-card.level-2-card.is-selected {
   background: var(--level2-bg); /* Deep violet fill */
   border-color: var(--level2-bg); /* Matching border */
@@ -264,38 +260,37 @@ h1, h2, h3, p {
   box-shadow: 0 12px 28px rgba(51, 18, 142, 0.28); /* Deeper shadow */
 }
 
-/* Top row inside round level selector */
+/* Top row inside level card (big number + radio circle) */
 .level-card-top {
-  display: flex; /* Align number and radio dot */
-  justify-content: center; /* Center horizontally inside circle */
-  align-items: center; /* Align vertically */
-  gap: 8px; /* Space between big digit and dot */
-  margin-bottom: 4px; /* Tight spacing above title */
+  display: flex; /* Horizontal flex row */
+  justify-content: space-between; /* Number left, radio right */
+  align-items: flex-start; /* Align to top */
+  margin-bottom: 18px; /* Space before title */
 }
 
-/* Giant italic number inside level selector */
+/* Giant italic number inside level card */
 .level-num {
-  font-size: 2.35rem; /* Bold display digit inside circle */
+  font-size: 3rem; /* Large display number */
   font-weight: 900; /* Extra bold */
   font-style: italic; /* Italic slant */
-  line-height: 0.95; /* Tight vertical height */
+  line-height: 0.9; /* Tight vertical height */
   color: var(--blue-selected); /* Blue for Level 1 */
 }
 
-/* Soft purple number for Level 2 selector */
+/* Soft purple number for Level 2 card */
 .level-card.level-2-card .level-num {
   color: var(--level2-tint); /* Light violet tint */
 }
 
-/* White digit when Level 1 or Level 2 is selected */
+/* White digit when selected */
 .level-card.is-selected .level-num {
-  color: #ffffff; /* White digit on filled circle */
+  color: #ffffff; /* Crisp white number when selected */
 }
 
 /* Outer circle of the custom radio indicator */
 .radio-dot {
-  width: 18px; /* Compact radio circle inside round selector */
-  height: 18px; /* Compact radio circle */
+  width: 24px; /* Circle width */
+  height: 24px; /* Circle height */
   border-radius: 50%; /* Full circle */
   border: 2px solid #c9c2e8; /* Unselected ring color */
   display: grid; /* Center inner dot */
@@ -305,7 +300,7 @@ h1, h2, h3, p {
 
 /* Selected radio ring on Level 1 */
 .level-card[data-level="1"].is-selected .radio-dot {
-  border-color: #ffffff; /* White ring on blue fill */
+  border-color: #ffffff; /* White ring */
 }
 
 /* Selected radio ring on Level 2 */
@@ -313,11 +308,11 @@ h1, h2, h3, p {
   border-color: #ffffff; /* White ring */
 }
 
-/* Inner dot when Level 1 is selected */
+/* Inner dot when Level 1 card is selected */
 .level-card[data-level="1"].is-selected .radio-dot::after {
   content: ""; /* Required for pseudo-element */
-  width: 8px; /* Inner dot diameter */
-  height: 8px; /* Inner dot diameter */
+  width: 12px; /* Inner dot diameter */
+  height: 12px; /* Inner dot diameter */
   border-radius: 50%; /* Circular dot */
   background: var(--blue-selected); /* Blue inner dot */
 }
@@ -325,31 +320,30 @@ h1, h2, h3, p {
 /* Inner dot when Level 2 card is selected */
 .level-card.level-2-card.is-selected .radio-dot::after {
   content: ""; /* Required for pseudo-element */
-  width: 8px; /* Inner dot diameter */
-  height: 8px; /* Inner dot diameter */
+  width: 12px; /* Inner dot diameter */
+  height: 12px; /* Inner dot diameter */
   border-radius: 50%; /* Circular dot */
   background: var(--level2-bg); /* Deep violet inner dot on white ring */
 }
 
-/* Level selector heading */
+/* Level card heading */
 .level-card-title {
-  font-size: 0.92rem; /* Compact title inside circle */
+  font-size: 1.05rem; /* Card title size */
   font-weight: 900; /* Heavy weight */
   text-transform: uppercase; /* Uppercase */
-  margin-bottom: 2px; /* Small gap below title */
+  margin-bottom: 4px; /* Small gap below title */
 }
 
-/* Level selector short description */
+/* Level card short description */
 .level-card-desc {
-  font-size: 0.72rem; /* Compact description inside circle */
-  line-height: 1.25; /* Tight line height */
+  font-size: 0.84rem; /* Small description */
   color: var(--muted); /* Muted text */
   margin: 0; /* No bottom margin */
 }
 
 /* Light text for description inside selected Level 1 or Level 2 */
 .level-card.is-selected .level-card-desc {
-  color: rgba(255, 255, 255, 0.9); /* Crisp light text on selected circle */
+  color: rgba(255, 255, 255, 0.88); /* Translucent white */
 }
 
 /* Primary full-width pill CTA button */
@@ -797,9 +791,9 @@ h1, h2, h3, p {
   margin-bottom: 2px; /* Small gap before input */
 }
 
-/* Force "coin" part onto its own line inside metric labels */
+/* Force "coin" / "coins" part onto its own line */
 .coin-line {
-  display: block; /* New line for "coin" */
+  display: block; /* Place on its own line */
   font-size: 0.65rem; /* Crisp secondary line size */
   letter-spacing: 0.08em; /* Consistent label tracking */
 }
@@ -823,7 +817,7 @@ h1, h2, h3, p {
   margin-top: 8px; /* Space above message */
 }
 
-/* Highlighted winner card on Results screen with points aligned to the right of name */
+/* Highlighted winner card on Results screen with points aligned right of name */
 .winner-card {
   background: var(--primary); /* Purple winner card */
   color: #ffffff; /* White text */
@@ -831,7 +825,7 @@ h1, h2, h3, p {
   padding: 18px 20px; /* Inner padding */
   display: flex; /* Left winner name + right score coin */
   align-items: center; /* Vertically center */
-  justify-content: space-between; /* Place points on the right of winner info */
+  justify-content: space-between; /* Place points right next to winner info */
   gap: 12px; /* Gap between name and points coin */
   margin-bottom: 14px; /* Space before runners-up */
   box-shadow: 0 14px 30px rgba(101, 40, 255, 0.25); /* Elevation shadow */
@@ -1333,14 +1327,9 @@ h1, h2, h3, p {
   margin: 0; /* Clean margin */
 }
 
-/* Phone-sized screens: keep header logo at 56px and round level circles sized neatly */
+/* Phone-sized screens: keep header logo at 56px */
 @media (max-width: 480px) {
   .brand-logo-only img {
     height: 56px; /* Prominent mobile header logo height */
-  }
-
-  .level-grid {
-    grid-template-columns: repeat(2, minmax(0, 142px)); /* Fit two round selectors comfortably on narrow phones */
-    gap: 12px; /* Slightly tighter gap on small screens */
   }
 }
