@@ -1,1335 +1,718 @@
-/* Define reusable CSS custom properties (design tokens) for colors and border radii */
+/* Palette de couleurs Slowly But Surely */
 :root {
-  --bg: #f4f2ff; /* Soft lavender main background */
-  --surface: #ffffff; /* Pure white card background */
-  --surface-soft: #ebe7fb; /* Light violet tint for secondary badges */
-  --ink: #140d3b; /* Deep indigo-black for primary text and headings */
-  --muted: #676285; /* Muted slate-violet for subtitles and helper text */
-  --line: #dad4f5; /* Subtle border color for cards and inputs */
-  --primary: #6528ff; /* Electric purple primary brand accent */
-  --primary-hover: #5217eb; /* Darker purple on button hover */
-  --blue-selected: #1d6ff2; /* Vivid blue when Level 1 is selected */
-  --level2-bg: #33128e; /* Deep violet surface for Level 2 indicators */
-  --level2-tint: #9d7dff; /* Soft violet accent inside Level 2 elements */
-  --gold: #f6be28; /* Gold coin and event header accent */
-  --gold-soft: #fff6d6; /* Warm cream background for event cards */
-  --gold-border: #d99b00; /* Gold border accent */
-  --danger: #ff4e6a; /* Coral-pink accent for final round and delete modals */
-  --radius-lg: 24px; /* Large rounded corners for main cards and modals */
-  --radius-md: 18px; /* Medium rounded corners for list items and inputs */
-  --radius-pill: 999px; /* Full pill radius for buttons and badges */
+  --ink: #1B1040;
+  --wall: #2B1E62;
+  --pink: #FF5FC8;
+  --violet: #6C3BF5;
+  --blue: #2F7BFF;
+  --white: #FFFFFF;
 }
 
-/* Apply border-box sizing to all elements so padding never inflates widths */
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--white);
+  font-family: "Kalam", cursive;
+  min-height: 100dvh;
 }
 
-/* Base document and body styling */
-html, body {
-  margin: 0; /* Remove default browser margins */
-  padding: 0; /* Remove default browser padding */
-  min-height: 100%; /* Ensure full vertical height */
-  background: var(--bg); /* Apply lavender background */
-  color: var(--ink); /* Apply primary text color */
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Clean sans-serif stack */
-  line-height: 1.45; /* Comfortable reading line spacing */
-  -webkit-font-smoothing: antialiased; /* Crisp font rendering on WebKit browsers */
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; }
+a { color: inherit; text-decoration: none; }
+.hidden { display: none !important; }
+
+/* Conteneur mobile plein écran */
+.shell {
+  max-width: 460px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 22px 18px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* Inherit typography on buttons and inputs */
-button, input {
-  font: inherit; /* Match parent font family and size */
-  color: inherit; /* Match parent text color */
+/* Écrans étirés sur toute la hauteur de l'écran */
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-/* Reset default button styles */
-button {
-  cursor: pointer; /* Show pointer cursor on interactive buttons */
-  border: 0; /* Remove default border */
-  background: none; /* Remove default background */
-  position: relative; /* Keep button stacking clean */
-  z-index: 2; /* Ensure buttons sit above decorative pseudo-elements */
-}
-
-/* Keep links clean when styled as buttons or nav actions */
-a {
-  color: inherit; /* Inherit text color */
-  text-decoration: none; /* Remove underline by default */
-}
-
-/* Utility class to hide elements reliably */
-.hidden {
-  display: none !important; /* Force hide even over other display rules */
-}
-
-/* Centered mobile-first container shell */
-.app-shell {
-  width: 100%; /* Full width on small screens */
-  max-width: 480px; /* Constrain width like a mobile app screen */
-  min-height: 100dvh; /* Fill dynamic viewport height */
-  margin: 0 auto; /* Center horizontally */
-  padding: 20px 20px 32px; /* Outer spacing */
-  display: flex; /* Flex layout for vertical screen flow */
-  flex-direction: column; /* Stack children vertically */
-  position: relative; /* Positioning context for child elements */
-}
-
-/* Top navigation / status bar */
 .top-bar {
-  display: flex; /* Place logo and right actions side by side */
-  align-items: center; /* Vertically center items */
-  justify-content: space-between; /* Push items to opposite edges */
-  gap: 10px; /* Minimum spacing between items */
-  margin-bottom: 20px; /* Space below top bar */
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* Right cluster inside header (Back to game above 15 CARDS badge) */
-.header-actions {
-  display: inline-flex; /* Align items cleanly */
-  flex-direction: column; /* Stack Back to game right above 15 CARDS badge */
-  align-items: flex-end; /* Align neatly to the right edge */
-  gap: 6px; /* Space between button and badge */
-  flex-shrink: 0; /* Prevent wrapping/squishing */
+.logo-btn { padding: 0; display: inline-flex; align-items: center; }
+.logo-svg { height: 24px; width: auto; display: block; }
+.logo-hero { height: 46px; margin: 0 auto; }
+
+/* Pilules d'en-tête identiques pour LEVEL 1 et LEVEL 2 */
+.lvl-pill, .pill-outline {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--white);
+  background: transparent;
+  color: var(--white);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-/* Compact button to return to an active game from the card guide */
-.return-game-btn {
-  display: inline-flex; /* Inline pill button */
-  align-items: center; /* Vertically center label */
-  justify-content: center; /* Center label */
-  padding: 6px 12px; /* Compact pill padding */
-  border-radius: var(--radius-pill); /* Pill shape */
-  background: var(--surface); /* White background */
-  color: var(--ink); /* Black/ink text */
-  border: 2px solid var(--line); /* Soft border */
-  font-size: 0.72rem; /* Compact uppercase font */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.06em; /* Slight letter spacing */
-  text-transform: uppercase; /* Uppercase */
-  white-space: nowrap; /* Keep on one line */
+.pill-white {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.76rem;
 }
 
-/* Hover state for return-to-game button */
-.return-game-btn:hover {
-  border-color: var(--primary); /* Highlight border */
-  color: var(--primary); /* Purple text on hover */
+.guide-pills {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
-/* Compact brand logo inside inner headers without duplicate text */
-.brand-logo-only {
-  display: inline-flex; /* Keep logo aligned cleanly on the left */
-  align-items: center; /* Vertically center logo image */
-  line-height: 1; /* Avoid extra line-height spacing */
+/* Accueil */
+.home-hero {
+  text-align: center;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Logo image size inside inner headers */
-.brand-logo-only img {
-  height: 34px; /* Default header logo height */
-  width: auto; /* Keep natural aspect ratio */
-  display: block; /* Prevent inline baseline gap */
+.hero-lead {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.45rem;
+  line-height: 1.3;
 }
 
-/* Level pill badge in the header */
-.level-badge {
-  display: inline-flex; /* Inline flex pill */
-  align-items: center; /* Vertically center label */
-  justify-content: center; /* Horizontally center label */
-  padding: 7px 16px; /* Inner pill padding */
-  border-radius: var(--radius-pill); /* Pill shape */
-  font-size: 0.78rem; /* Small uppercase label size */
-  font-weight: 900; /* Heavy label weight */
-  letter-spacing: 0.08em; /* Wide tracking for uppercase badge */
-  text-transform: uppercase; /* Force uppercase text */
-  white-space: nowrap; /* Prevent badge text wrap */
+.hero-sub, .hint-line, .page-sub {
+  margin: 0;
+  font-size: 0.92rem;
+  opacity: 0.85;
 }
 
-/* Styling for Level 1 badge */
-.level-badge.is-level-1 {
-  background: var(--surface); /* White background */
-  color: var(--blue-selected); /* Blue text */
-  border: 2px solid var(--line); /* Soft lavender border */
+.tap-hint {
+  margin: 2px 0 0;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 
-/* Styling for Level 2 badge */
-.level-badge.is-level-2 {
-  background: var(--level2-bg); /* Deep violet background */
-  color: #ffffff; /* White text */
+.section-label {
+  display: block;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
 }
 
-/* Small uppercase label above major numbers or sections */
-.eyebrow {
-  margin: 0; /* Remove default margin */
-  font-size: 0.78rem; /* Small uppercase size */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.16em; /* Wide tracking */
-  text-transform: uppercase; /* Uppercase styling */
-  color: var(--primary); /* Default purple accent */
-}
-
-/* Red/coral eyebrow styling used on final round */
-.eyebrow.is-final {
-  color: var(--danger); /* Coral accent */
-}
-
-/* Reset top margins on headings and paragraphs */
-h1, h2, h3, p {
-  margin-top: 0; /* Prevent unexpected top spacing */
-}
-
-/* Home screen vertical layout */
-.home-screen {
-  flex: 1; /* Take available vertical height */
-  display: flex; /* Flex column layout */
-  flex-direction: column; /* Stack top content and bottom CTA */
-  justify-content: space-between; /* Distribute top block and bottom action */
-  text-align: center; /* Center-align home content */
-  padding-top: 8px; /* Subtle top breathing room */
-}
-
-/* Main logo image on the home screen */
-.hero-logo {
-  max-width: 250px; /* Cap logo width */
-  width: 100%; /* Responsive width */
-  height: auto; /* Keep aspect ratio */
-  margin: 4px auto 14px; /* Center horizontally and space below */
-  display: block; /* Block element */
-}
-
-/* Main tagline on the home screen */
-.hero-title {
-  font-size: 1.3rem; /* Prominent tagline size */
-  font-weight: 800; /* Bold weight */
-  margin-bottom: 6px; /* Space before subtitle */
-}
-
-/* Subtitle explaining game format on home screen */
-.hero-subtitle {
-  color: var(--muted); /* Muted text */
-  font-size: 0.9rem; /* Slightly smaller body text */
-  margin-bottom: 24px; /* Space before level selector */
-}
-
-/* Label above the two level selector cards */
-.level-picker-label {
-  font-size: 0.78rem; /* Small uppercase label */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.14em; /* Wide tracking */
-  text-transform: uppercase; /* Uppercase text */
-  color: var(--primary); /* Purple accent */
-  margin-bottom: 12px; /* Space before cards */
-}
-
-/* Two-column grid for Level 1 and Level 2 cards (classic card shape) */
+/* Cartes de choix de niveau : Level 1 en bleu, Level 2 en rose */
 .level-grid {
-  display: grid; /* CSS grid */
-  grid-template-columns: 1fr 1fr; /* Two equal columns */
-  gap: 14px; /* Gap between cards */
-  margin-bottom: 20px; /* Space below cards */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
-/* Individual level option card */
-.level-card {
-  position: relative; /* Positioning context */
-  text-align: left; /* Left-align text inside card */
-  border-radius: var(--radius-lg); /* Rounded card corners */
-  padding: 18px 16px; /* Inner card padding */
-  background: var(--surface); /* White background */
-  border: 2px solid var(--line); /* Default border */
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; /* Smooth state transitions */
+.lvl-card {
+  background: var(--wall);
+  border: 2px solid var(--violet);
+  border-radius: 20px;
+  padding: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* Press feedback on level card */
-.level-card:active {
-  transform: scale(0.98); /* Subtle press shrink */
+.lvl-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* Blue selected state for Level 1 card */
-.level-card[data-level="1"].is-selected {
-  background: var(--blue-selected); /* Blue fill when Level 1 is selected */
-  border-color: var(--blue-selected); /* Matching blue border */
-  color: #ffffff; /* White text */
-  box-shadow: 0 10px 24px rgba(29, 111, 242, 0.25); /* Blue elevation */
+.lvl-num {
+  font-family: "Permanent Marker", cursive;
+  font-size: 2rem;
+  line-height: 1;
 }
 
-/* Active selected state for Level 2 card */
-.level-card.level-2-card.is-selected {
-  background: var(--level2-bg); /* Deep violet fill */
-  border-color: var(--level2-bg); /* Matching border */
-  color: #ffffff; /* White text */
-  box-shadow: 0 12px 28px rgba(51, 18, 142, 0.28); /* Deeper shadow */
-}
-
-/* Top row inside level card (big number + radio circle) */
-.level-card-top {
-  display: flex; /* Horizontal flex row */
-  justify-content: space-between; /* Number left, radio right */
-  align-items: flex-start; /* Align to top */
-  margin-bottom: 18px; /* Space before title */
-}
-
-/* Giant italic number inside level card */
-.level-num {
-  font-size: 3rem; /* Large display number */
-  font-weight: 900; /* Extra bold */
-  font-style: italic; /* Italic slant */
-  line-height: 0.9; /* Tight vertical height */
-  color: var(--blue-selected); /* Blue for Level 1 */
-}
-
-/* Soft purple number for Level 2 card */
-.level-card.level-2-card .level-num {
-  color: var(--level2-tint); /* Light violet tint */
-}
-
-/* White digit when selected */
-.level-card.is-selected .level-num {
-  color: #ffffff; /* Crisp white number when selected */
-}
-
-/* Outer circle of the custom radio indicator */
 .radio-dot {
-  width: 24px; /* Circle width */
-  height: 24px; /* Circle height */
-  border-radius: 50%; /* Full circle */
-  border: 2px solid #c9c2e8; /* Unselected ring color */
-  display: grid; /* Center inner dot */
-  place-items: center; /* Center both axes */
-  background: #ffffff; /* White fill */
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
 }
 
-/* Selected radio ring on Level 1 */
-.level-card[data-level="1"].is-selected .radio-dot {
-  border-color: #ffffff; /* White ring */
+.lvl-name { font-family: "Permanent Marker", cursive; font-size: 1.15rem; }
+.lvl-desc { font-size: 0.82rem; opacity: 0.85; }
+
+.lvl-card.is-sel-1 {
+  background: var(--white);
+  border-color: var(--blue);
+  color: var(--ink);
+}
+.lvl-card.is-sel-1 .lvl-num { color: var(--blue); }
+.lvl-card.is-sel-1 .radio-dot { background: var(--blue); border-color: var(--ink); }
+
+.lvl-card.is-sel-2 {
+  background: var(--white);
+  border-color: var(--pink);
+  color: var(--ink);
+}
+.lvl-card.is-sel-2 .lvl-num { color: var(--pink); }
+.lvl-card.is-sel-2 .radio-dot { background: var(--pink); border-color: var(--ink); }
+
+/* Boutons d'action principaux et bouton SVG Cards */
+.cta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
 }
 
-/* Selected radio ring on Level 2 */
-.level-card.level-2-card.is-selected .radio-dot {
-  border-color: #ffffff; /* White ring */
+.btn-main, .btn-outline {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 999px;
+  text-align: center;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  display: block;
 }
 
-/* Inner dot when Level 1 card is selected */
-.level-card[data-level="1"].is-selected .radio-dot::after {
-  content: ""; /* Required for pseudo-element */
-  width: 12px; /* Inner dot diameter */
-  height: 12px; /* Inner dot diameter */
-  border-radius: 50%; /* Circular dot */
-  background: var(--blue-selected); /* Blue inner dot */
+.btn-main { background: var(--pink); color: var(--ink); }
+.btn-outline { border: 2px solid var(--white); color: var(--white); }
+
+.btn-svg-link {
+  display: block;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-/* Inner dot when Level 2 card is selected */
-.level-card.level-2-card.is-selected .radio-dot::after {
-  content: ""; /* Required for pseudo-element */
-  width: 12px; /* Inner dot diameter */
-  height: 12px; /* Inner dot diameter */
-  border-radius: 50%; /* Circular dot */
-  background: var(--level2-bg); /* Deep violet inner dot on white ring */
+.btn-svg-img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* Level card heading */
-.level-card-title {
-  font-size: 1.05rem; /* Card title size */
-  font-weight: 900; /* Heavy weight */
-  text-transform: uppercase; /* Uppercase */
-  margin-bottom: 4px; /* Small gap below title */
+.page-title {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 2.1rem;
 }
 
-/* Level card short description */
-.level-card-desc {
-  font-size: 0.84rem; /* Small description */
-  color: var(--muted); /* Muted text */
-  margin: 0; /* No bottom margin */
+.page-head { display: flex; flex-direction: column; gap: 4px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.stack-lg { display: flex; flex-direction: column; gap: 22px; }
+
+/* Joueurs */
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-/* Light text for description inside selected Level 1 or Level 2 */
-.level-card.is-selected .level-card-desc {
-  color: rgba(255, 255, 255, 0.88); /* Translucent white */
-}
-
-/* Primary full-width pill CTA button */
-.cta-btn {
-  width: 100%; /* Full width */
-  padding: 18px 22px; /* Generous touch target */
-  border-radius: var(--radius-pill); /* Pill shape */
-  font-size: 1rem; /* Button text size */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.06em; /* Uppercase tracking */
-  text-transform: uppercase; /* Uppercase label */
-  background: var(--primary); /* Purple background */
-  color: #ffffff; /* White text */
-  box-shadow: 0 10px 24px rgba(101, 40, 255, 0.25); /* Soft elevation */
-  transition: transform 0.14s ease, background 0.14s ease; /* Smooth feedback */
-}
-
-/* Hover state for primary CTA */
-.cta-btn:hover {
-  background: var(--primary-hover); /* Darker purple */
-}
-
-/* Active press state for CTA */
-.cta-btn:active {
-  transform: scale(0.985); /* Slight press down */
-}
-
-/* Gold CTA variant used for final score calculation */
-.cta-btn.is-gold {
-  background: var(--gold); /* Gold fill */
-  color: var(--ink); /* Dark text for contrast */
-  box-shadow: 0 10px 24px rgba(246, 190, 40, 0.3); /* Gold shadow */
-}
-
-/* Outlined secondary CTA variant */
-.cta-btn.is-outline {
-  background: #ffffff; /* White fill */
-  color: var(--primary); /* Purple text */
-  border: 2px solid var(--primary); /* Purple border */
-  box-shadow: none; /* Flat outline style */
-}
-
-/* Pill button matching bouton cards.png (double card icon + purple CARDS label) */
-.cards-pill-btn {
-  width: 100%; /* Full width inside mobile container */
-  margin-top: 14px; /* Space below preceding block or CTA */
-  padding: 12px 20px; /* Pill height matching visual mockup */
-  border-radius: var(--radius-pill); /* Full capsule border radius */
-  background: var(--surface); /* Crisp white interior fill */
-  border: 3px solid #dcd6f7; /* Soft lavender pill border */
-  color: var(--primary); /* Electric purple label color */
-  font-size: 1.05rem; /* Bold pill label size */
-  font-weight: 900; /* Heavy display weight */
-  font-style: italic; /* Dynamic italic styling */
-  letter-spacing: 0.04em; /* Slight letter spacing */
-  text-transform: uppercase; /* Force uppercase CARDS */
-  display: inline-flex; /* Align icon and label horizontally */
-  align-items: center; /* Vertically center icon and text */
-  justify-content: center; /* Center content inside pill */
-  gap: 12px; /* Space between card stack icon and CARDS text */
-  box-shadow: 0 6px 16px rgba(20, 13, 59, 0.05); /* Subtle elevation */
-  transition: transform 0.14s ease, border-color 0.14s ease; /* Smooth feedback */
-}
-
-/* Hover feedback on CARDS pill button */
-.cards-pill-btn:hover {
-  border-color: var(--primary); /* Highlight border in purple on hover */
-}
-
-/* Active press feedback on CARDS pill button */
-.cards-pill-btn:active {
-  transform: scale(0.985); /* Subtle press shrink */
-}
-
-/* Double overlapping cards icon inside CARDS pill button */
-.cards-icon {
-  position: relative; /* Anchor overlapping back and front cards */
-  width: 28px; /* Icon bounding width */
-  height: 24px; /* Icon bounding height */
-  flex-shrink: 0; /* Prevent icon distortion */
-}
-
-/* Back blue card of the overlapping pair */
-.cards-icon::before {
-  content: ""; /* Required for pseudo-element */
-  position: absolute; /* Position slightly left and down */
-  left: 0; /* Left offset */
-  top: 4px; /* Top offset */
-  width: 16px; /* Card width */
-  height: 18px; /* Card height */
-  border-radius: 5px; /* Rounded card corners */
-  background: #55a8ff; /* Sky/royal blue card fill */
-  border: 2.5px solid var(--ink); /* Dark ink outline */
-}
-
-/* Front white card of the overlapping pair */
-.cards-icon::after {
-  content: ""; /* Required for pseudo-element */
-  position: absolute; /* Position overlapping to the right and top */
-  right: 0; /* Right offset */
-  top: 0; /* Top offset */
-  width: 17px; /* Card width */
-  height: 19px; /* Card height */
-  border-radius: 5px; /* Rounded card corners */
-  background: #ffffff; /* White card face */
-  border: 2.5px solid var(--ink); /* Dark ink outline */
-  box-shadow: inset 0 5px 0 -1px #ffffff, inset 0 8px 0 -1px var(--primary); /* Small purple bar inside front card */
-}
-
-/* Subtle helper caption below actions */
-.helper-note {
-  margin-top: 12px; /* Top spacing */
-  font-size: 0.8rem; /* Small caption size */
-  color: var(--muted); /* Muted text */
-  text-align: center; /* Centered text */
-}
-
-/* Large italic screen title used on inner screens */
-.screen-title {
-  font-size: 2.2rem; /* Bold display size */
-  font-weight: 900; /* Extra bold */
-  font-style: italic; /* Italic emphasis */
-  text-transform: uppercase; /* Uppercase */
-  letter-spacing: -0.01em; /* Tight display kerning */
-  margin-bottom: 4px; /* Space below heading */
-}
-
-/* Subtitle below screen title */
-.screen-subtitle {
-  color: var(--muted); /* Muted text */
-  font-size: 0.95rem; /* Body size */
-  margin-bottom: 18px; /* Space below subtitle */
-}
-
-/* 3-button switcher for choosing 2, 3, or 4 players */
-.count-switcher {
-  display: grid; /* Grid layout */
-  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
-  gap: 10px; /* Gap between count buttons */
-  margin-bottom: 18px; /* Space below switcher */
-}
-
-/* Individual player count button */
 .count-btn {
-  padding: 14px 10px; /* Button padding */
-  border-radius: 16px; /* Rounded corners */
-  background: var(--surface); /* White background */
-  border: 2px solid var(--line); /* Default border */
-  font-size: 1.35rem; /* Large number */
-  font-weight: 900; /* Heavy weight */
-  font-style: italic; /* Italic number */
-  color: var(--ink); /* Dark text */
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--wall);
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.5rem;
 }
 
-/* Selected player count button */
-.count-btn.is-active {
-  background: var(--primary); /* Purple fill */
-  border-color: var(--primary); /* Matching border */
-  color: #ffffff; /* White text */
+.count-btn.is-active { background: var(--white); color: var(--ink); }
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Stack of player name inputs */
-.player-inputs {
-  display: flex; /* Vertical stack */
-  flex-direction: column; /* Column direction */
-  gap: 12px; /* Space between rows */
-  margin-bottom: 24px; /* Space before start button */
+.dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  flex-shrink: 0;
 }
 
-/* Row containing player color swatch and name input */
-.player-name-row {
-  display: flex; /* Horizontal row */
-  align-items: center; /* Vertically center swatch and input */
-  gap: 12px; /* Gap between swatch and field */
+.name-inp {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  border: 0;
 }
 
-/* Colored token circle representing each player */
-.token-swatch {
-  width: 26px; /* Circle diameter */
-  height: 26px; /* Circle diameter */
-  border-radius: 50%; /* Full circle */
-  flex-shrink: 0; /* Prevent squishing */
-  border: 4px solid var(--ink); /* Dark ring around token color */
+.err-msg {
+  margin: 0;
+  color: var(--pink);
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
 }
 
-/* Text input for player name */
-.name-input {
-  flex: 1; /* Fill remaining row width */
-  padding: 14px 16px; /* Comfortable input padding */
-  border-radius: 16px; /* Rounded input box */
-  background: var(--surface); /* White background */
-  border: 2px solid var(--line); /* Default border */
-  font-size: 1rem; /* Input text size */
-  font-weight: 700; /* Bold name text */
-  outline: none; /* Custom focus border used instead */
+/* Manches */
+.round-box { text-align: center; }
+
+.round-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
+  color: var(--pink);
 }
 
-/* Focus state on player name input */
-.name-input:focus {
-  border-color: var(--primary); /* Highlight border on focus */
+.round-big {
+  font-family: "Permanent Marker", cursive;
+  font-size: 4.5rem;
+  line-height: 1;
+  margin: 6px 0 14px;
 }
 
-/* Centered round header block */
-.round-hero {
-  text-align: center; /* Center round indicator */
-  margin-bottom: 18px; /* Space before event card */
-}
-
-/* Giant round fraction display (e.g. 1/6, 3/6, 6/6) */
-.round-counter {
-  font-size: 4.2rem; /* Very large counter */
-  font-weight: 900; /* Extra bold */
-  font-style: italic; /* Italic styling */
-  line-height: 0.95; /* Tight line height */
-  margin: 6px 0 14px; /* Vertical spacing */
-}
-
-/* 6-segment progress indicator row */
 .round-bars {
-  display: grid; /* Grid of 6 segments */
-  grid-template-columns: repeat(6, 1fr); /* 6 equal bars */
-  gap: 8px; /* Gap between segments */
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
 }
 
-/* Single round progress bar segment */
-.round-bar {
-  height: 7px; /* Thin bar height */
-  border-radius: var(--radius-pill); /* Pill ends */
-  background: #dcd6f7; /* Inactive segment color */
+.r-bar { height: 6px; border-radius: 999px; background: var(--wall); }
+.r-bar.is-on { background: var(--pink); }
+
+.event-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* Completed/active round segment */
-.round-bar.is-done {
-  background: var(--primary); /* Purple active bar */
+.event-wait {
+  background: var(--wall);
+  border-radius: 24px;
+  padding: 36px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
-/* Final round (6/6) progress bar color */
-.round-bar.is-final {
-  background: var(--danger); /* Coral bar on last round */
+.q-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.6rem;
 }
 
-/* Dashed placeholder box before drawing the round's event */
-.event-placeholder {
-  border: 2.5px dashed #9d87f5; /* Dashed purple border */
-  border-radius: var(--radius-lg); /* Rounded box */
-  background: rgba(255, 255, 255, 0.72); /* Translucent white card */
-  padding: 36px 22px; /* Generous inner spacing */
-  text-align: center; /* Centered text */
-  margin-bottom: 22px; /* Space before action button */
+.event-card {
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 24px;
+  overflow: hidden;
 }
 
-/* Question mark badge inside placeholder */
-.q-badge {
-  width: 56px; /* Badge diameter */
-  height: 56px; /* Badge diameter */
-  border-radius: 50%; /* Circular badge */
-  background: var(--surface-soft); /* Soft purple circle */
-  color: var(--primary); /* Purple question mark */
-  font-size: 1.6rem; /* Large question mark */
-  font-weight: 900; /* Bold weight */
-  display: grid; /* Center character */
-  place-items: center; /* Center horizontally and vertically */
-  margin: 0 auto 14px; /* Center horizontally and space below */
+.event-head {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
 }
 
-/* Drawn event card container */
-.event-card-box {
-  border-radius: var(--radius-lg); /* Rounded card */
-  overflow: hidden; /* Clip header corners cleanly */
-  background: var(--gold-soft); /* Soft yellow card body */
-  border: 2px solid var(--gold-border); /* Gold border */
-  margin-bottom: 22px; /* Space before button */
-  box-shadow: 0 10px 24px rgba(217, 155, 0, 0.12); /* Subtle warm shadow */
+.excl-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
 }
 
-/* Yellow banner header at top of event card */
-.event-card-head {
-  background: var(--gold); /* Solid gold banner */
-  padding: 12px 18px; /* Header padding */
-  display: flex; /* Label left, exclamation circle right */
-  align-items: center; /* Vertically center */
-  justify-content: space-between; /* Spread items */
-  font-size: 0.78rem; /* Small banner text */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.12em; /* Uppercase tracking */
-  text-transform: uppercase; /* Uppercase */
+.event-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Dark circular exclamation badge inside event header */
-.event-excl {
-  width: 24px; /* Circle diameter */
-  height: 24px; /* Circle diameter */
-  border-radius: 50%; /* Full circle */
-  background: var(--ink); /* Dark fill */
-  color: #ffffff; /* White exclamation mark */
-  display: grid; /* Center symbol */
-  place-items: center; /* Center both axes */
-  font-size: 0.85rem; /* Symbol size */
+.event-name {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.7rem;
 }
 
-/* Body area of the event card */
-.event-card-body {
-  padding: 20px 18px; /* Card body padding */
+.event-tip {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid #E5E7EB;
+  font-size: 0.85rem;
+  opacity: 0.75;
 }
 
-/* Event name heading */
-.event-title {
-  font-size: 1.55rem; /* Bold event title */
-  font-weight: 900; /* Heavy weight */
-  font-style: italic; /* Italic emphasis */
-  text-transform: uppercase; /* Uppercase */
-  margin-bottom: 10px; /* Space before effect */
+/* Scores et résultats */
+.score-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
 }
 
-/* Event effect description */
-.event-effect {
-  font-size: 1rem; /* Readable effect text */
-  font-weight: 700; /* Semi-bold/bold */
-  margin-bottom: 18px; /* Space before footer note */
-}
-
-/* Footer reminder inside event card */
-.event-footer-tip {
-  border-top: 1px solid rgba(20, 13, 59, 0.14); /* Subtle divider line */
-  padding-top: 12px; /* Space above note */
-  font-size: 0.84rem; /* Small note size */
-  color: var(--muted); /* Muted text */
-  margin: 0; /* No bottom margin */
-}
-
-/* Player score entry card on Final Scores screen */
 .score-card {
-  background: var(--surface); /* White card */
-  border: 2px solid var(--line); /* Default border */
-  border-radius: var(--radius-lg); /* Rounded card */
-  padding: 16px; /* Inner padding */
-  margin-bottom: 14px; /* Gap between player score cards */
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 22px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* Highlight card border when validation fails */
-.score-card.has-error {
-  border-color: var(--danger); /* Coral error border */
+.score-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-/* Header row inside score card (player name + optional Mission +5 toggle) */
-.score-card-head {
-  display: flex; /* Horizontal row */
-  align-items: center; /* Vertically center */
-  justify-content: space-between; /* Name left, mission toggle right */
-  gap: 10px; /* Gap between elements */
-  margin-bottom: 12px; /* Space before 2x2 inputs */
+.mission-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Player name and color dot inside score card */
-.player-ident {
-  display: flex; /* Horizontal flex */
-  align-items: center; /* Center vertically */
-  gap: 10px; /* Gap between swatch and name */
-  font-size: 1.15rem; /* Player name size */
-  font-weight: 900; /* Heavy weight */
-  text-transform: uppercase; /* Uppercase name */
+.mission-pill.is-on { background: var(--pink); }
+
+/* Grille des 5 champs de saisie des scores (pions + pièces) */
+.metrics-5 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-/* Mission +5 checkbox pill toggle (Level 2 only) */
-.mission-toggle {
-  display: inline-flex; /* Inline pill */
-  align-items: center; /* Center checkbox and text */
-  gap: 8px; /* Space between checkbox and label */
-  padding: 8px 12px; /* Pill padding */
-  border-radius: 12px; /* Rounded pill */
-  border: 2px solid var(--line); /* Border */
-  background: var(--bg); /* Soft background */
-  font-size: 0.76rem; /* Compact label */
-  font-weight: 900; /* Heavy weight */
-  text-transform: uppercase; /* Uppercase */
-  cursor: pointer; /* Pointer cursor */
+.m-box {
+  background: #F4F5FB;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--violet);
 }
 
-/* Native checkbox inside mission toggle */
-.mission-toggle input {
-  accent-color: var(--primary); /* Purple checkbox accent */
-  width: 16px; /* Checkbox width */
-  height: 16px; /* Checkbox height */
+.m-box.is-wide { grid-column: span 2; }
+
+.m-box label {
+  display: block;
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
 }
 
-/* Checked visual state for Mission +5 pill */
-.mission-toggle.is-checked {
-  background: var(--level2-bg); /* Deep violet fill */
-  border-color: var(--level2-bg); /* Matching border */
-  color: #ffffff; /* White text */
+.m-box input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.35rem;
+  color: var(--ink);
+  margin-top: 4px;
 }
 
-/* 2x2 grid for the 4 numeric inputs per player */
-.metrics-grid {
-  display: grid; /* Grid layout */
-  grid-template-columns: 1fr 1fr; /* Two columns */
-  gap: 10px; /* Gap between metric boxes */
-}
-
-/* Individual metric input tile */
-.metric-box {
-  position: relative; /* Context for left accent bar */
-  background: #f6f4ff; /* Soft input tile fill */
-  border: 2px solid transparent; /* Reserve border space */
-  border-radius: 14px; /* Rounded tile */
-  padding: 10px 12px 10px 16px; /* Extra left padding for accent bar */
-}
-
-/* Left vertical color stripe on metric tile */
-.metric-box::before {
-  content: ""; /* Required for pseudo-element */
-  position: absolute; /* Position on left edge */
-  left: 6px; /* Inset from left */
-  top: 10px; /* Top inset */
-  bottom: 10px; /* Bottom inset */
-  width: 4px; /* Thin vertical bar */
-  border-radius: 99px; /* Rounded bar ends */
-  background: var(--primary); /* Default purple bar */
-}
-
-/* Gold accent bar for remaining coins */
-.metric-box.is-gold::before {
-  background: var(--gold); /* Gold bar */
-}
-
-/* Dark accent bar for market tokens */
-.metric-box.is-dark::before {
-  background: var(--ink); /* Dark bar */
-}
-
-/* Focus state when typing inside a metric tile */
-.metric-box:focus-within {
-  border-color: var(--primary); /* Purple border */
-  background: #ffffff; /* Bright white surface */
-}
-
-/* Metric tile label with "coin" placed on its own line */
-.metric-box label {
-  display: block; /* Block label above number */
-  font-size: 0.68rem; /* Small uppercase label */
-  font-weight: 800; /* Bold label */
-  letter-spacing: 0.08em; /* Tracking */
-  text-transform: uppercase; /* Uppercase */
-  color: var(--muted); /* Muted color */
-  margin-bottom: 2px; /* Small gap before input */
-}
-
-/* Force "coin" / "coins" part onto its own line */
-.coin-line {
-  display: block; /* Place on its own line */
-  font-size: 0.65rem; /* Crisp secondary line size */
-  letter-spacing: 0.08em; /* Consistent label tracking */
-}
-
-/* Numeric input inside metric tile */
-.metric-box input {
-  width: 100%; /* Full tile width */
-  border: 0; /* Borderless inside tile */
-  background: transparent; /* Transparent fill */
-  font-size: 1.35rem; /* Large numeric display */
-  font-weight: 900; /* Heavy numbers */
-  outline: none; /* Clean focus */
-  padding: 0; /* No extra padding */
-}
-
-/* Validation error message text */
-.error-text {
-  color: var(--danger); /* Coral error color */
-  font-size: 0.82rem; /* Small readable error */
-  font-weight: 700; /* Bold error text */
-  margin-top: 8px; /* Space above message */
-}
-
-/* Highlighted winner card on Results screen with points aligned right of name */
 .winner-card {
-  background: var(--primary); /* Purple winner card */
-  color: #ffffff; /* White text */
-  border-radius: var(--radius-lg); /* Rounded card */
-  padding: 18px 20px; /* Inner padding */
-  display: flex; /* Left winner name + right score coin */
-  align-items: center; /* Vertically center */
-  justify-content: space-between; /* Place points right next to winner info */
-  gap: 12px; /* Gap between name and points coin */
-  margin-bottom: 14px; /* Space before runners-up */
-  box-shadow: 0 14px 30px rgba(101, 40, 255, 0.25); /* Elevation shadow */
+  background: var(--pink);
+  color: var(--ink);
+  border-radius: 24px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* Small "WINNER" label inside winner card */
-.winner-eyebrow {
-  font-size: 0.72rem; /* Small label */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.16em; /* Wide tracking */
-  text-transform: uppercase; /* Uppercase */
-  opacity: 0.85; /* Subtle contrast */
-  margin-bottom: 6px; /* Space below label */
+.winner-name {
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0;
 }
 
-/* Winner name row */
-.winner-name-row {
-  display: flex; /* Color dot + name */
-  align-items: center; /* Vertically center */
-  gap: 8px; /* Space between dot and name */
-  font-size: 1.55rem; /* Winner name size fitting alongside points */
-  font-weight: 900; /* Extra bold */
-  font-style: italic; /* Italic display */
-  text-transform: uppercase; /* Uppercase */
-  line-height: 1.05; /* Tight line height */
+.pts-ring {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 4px solid var(--ink);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.7rem;
+  flex-shrink: 0;
 }
 
-/* White-bordered color dot next to winner name */
-.winner-dot {
-  width: 20px; /* Dot diameter */
-  height: 20px; /* Dot diameter */
-  border-radius: 50%; /* Full circle */
-  border: 3px solid #ffffff; /* White outline */
-  flex-shrink: 0; /* Prevent shrinking */
+.runner-card {
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* Conversion rate and bonus summary inside winner card */
-.winner-meta {
-  font-size: 0.84rem; /* Meta text size */
-  margin-top: 8px; /* Space above meta */
-  opacity: 0.92; /* Slightly softer white */
+.rank-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
 }
 
-/* Gold coin medallion displaying total points on the right of winner name */
-.score-coin {
-  width: 78px; /* Coin width */
-  height: 78px; /* Coin height */
-  border-radius: 50%; /* Circular coin */
-  background: var(--gold); /* Gold background */
-  color: var(--ink); /* Dark points text */
-  border: 4px solid #e0a300; /* Outer gold rim */
-  display: flex; /* Stack points and "POINTS" label */
-  flex-direction: column; /* Vertical stack */
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  flex-shrink: 0; /* Keep circular shape */
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.45); /* Inner coin shine */
+.bonus-note {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
 }
 
-/* Total score number inside coin */
-.score-coin strong {
-  font-size: 1.7rem; /* Prominent score */
-  font-weight: 900; /* Extra bold */
-  line-height: 1; /* Tight height */
+.bonus-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pink);
+  flex-shrink: 0;
 }
 
-/* "POINTS" caption inside coin */
-.score-coin span {
-  font-size: 0.62rem; /* Small label */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.1em; /* Tracking */
+/* Guide des cartes */
+.guide-list-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Secondary ranking row for positions 2, 3, and 4 */
-.runner-up-card {
-  background: var(--surface); /* White card */
-  border: 2px solid var(--line); /* Soft border */
-  border-radius: 18px; /* Rounded card */
-  padding: 14px 16px; /* Inner padding */
-  display: flex; /* Left rank + info, right points */
-  align-items: center; /* Vertically center */
-  justify-content: space-between; /* Spread left and right */
-  gap: 12px; /* Gap */
-  margin-bottom: 10px; /* Space between rows */
+.stage-chip {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 5px 18px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
 }
 
-/* Circular position badge (2, 3, 4) */
-.rank-badge {
-  width: 30px; /* Badge width */
-  height: 30px; /* Badge height */
-  border-radius: 50%; /* Circle */
-  color: #ffffff; /* White rank digit */
-  font-weight: 900; /* Bold digit */
-  display: grid; /* Center digit */
-  place-items: center; /* Center both axes */
-  flex-shrink: 0; /* Keep circle */
-}
-
-/* Runner-up player name */
-.runner-title {
-  font-weight: 900; /* Bold name */
-  text-transform: uppercase; /* Uppercase */
-  font-size: 1rem; /* Name size */
-}
-
-/* Runner-up breakdown subtitle */
-.runner-sub {
-  font-size: 0.8rem; /* Small breakdown text */
-  color: var(--muted); /* Muted text */
-}
-
-/* Runner-up total points label */
-.runner-pts {
-  font-size: 1.2rem; /* Points size */
-  font-weight: 900; /* Heavy weight */
-  font-style: italic; /* Italic styling */
-  color: var(--primary); /* Purple score */
-  white-space: nowrap; /* Prevent line wrap */
-}
-
-/* Footer note explaining the +3 best conversion rate bonus */
-.bonus-legend {
-  display: flex; /* Coin + text */
-  align-items: center; /* Center vertically */
-  gap: 10px; /* Gap between coin and text */
-  font-size: 0.85rem; /* Small text */
-  color: var(--muted); /* Muted color */
-  margin: 14px 0 22px; /* Vertical spacing */
-}
-
-/* Small gold coin icon next to bonus note */
-.mini-coin {
-  width: 24px; /* Diameter */
-  height: 24px; /* Diameter */
-  border-radius: 50%; /* Circle */
-  background: var(--gold); /* Gold fill */
-  border: 2px solid var(--gold-border); /* Gold rim */
-  flex-shrink: 0; /* Keep circular */
-}
-
-/* Full-screen translucent overlay for confirmation dialogs */
-.modal-backdrop {
-  position: fixed; /* Cover viewport */
-  inset: 0; /* Top/right/bottom/left 0 */
-  background: rgba(20, 13, 59, 0.58); /* Dimmed indigo backdrop */
-  display: grid; /* Center modal card */
-  place-items: center; /* Center both axes */
-  padding: 20px; /* Screen edge padding */
-  z-index: 40; /* Above regular content */
-}
-
-/* Centered dialog box inside modal backdrop */
-.modal-card {
-  width: 100%; /* Full width up to max-width */
-  max-width: 380px; /* Dialog width */
-  background: var(--surface); /* White modal surface */
-  border-radius: var(--radius-lg); /* Rounded dialog */
-  padding: 26px 22px 22px; /* Inner spacing */
-  text-align: center; /* Centered dialog text */
-  box-shadow: 0 20px 44px rgba(20, 13, 59, 0.25); /* Modal elevation */
-}
-
-/* Circular icon at top of modal */
-.modal-icon {
-  width: 56px; /* Circle width */
-  height: 56px; /* Circle height */
-  border-radius: 50%; /* Full circle */
-  margin: 0 auto 14px; /* Center and space below */
-  display: grid; /* Center glyph */
-  place-items: center; /* Center both axes */
-  font-size: 1.5rem; /* Icon size */
-  font-weight: 900; /* Bold glyph */
-  color: #ffffff; /* White icon */
-}
-
-/* Purple icon variant for round confirmation */
-.modal-icon.is-purple {
-  background: var(--primary); /* Purple fill */
-}
-
-/* Coral icon variant for delete/reset confirmation */
-.modal-icon.is-danger {
-  background: var(--danger); /* Coral fill */
-}
-
-/* Modal title heading */
-.modal-title {
-  font-size: 1.45rem; /* Bold modal title */
-  font-weight: 900; /* Heavy weight */
-  font-style: italic; /* Italic emphasis */
-  text-transform: uppercase; /* Uppercase */
-  margin-bottom: 8px; /* Space before description */
-}
-
-/* Modal description paragraph */
-.modal-desc {
-  color: var(--muted); /* Muted text */
-  font-size: 0.92rem; /* Body size */
-  margin-bottom: 20px; /* Space before buttons */
-}
-
-/* Two-button action row inside modal */
-.modal-actions {
-  display: grid; /* Two equal buttons */
-  grid-template-columns: 1fr 1fr; /* Two columns */
-  gap: 12px; /* Gap between Cancel and Confirm */
-}
-
-/* Base modal action button */
-.modal-btn {
-  padding: 14px 12px; /* Button padding */
-  border-radius: var(--radius-pill); /* Pill shape */
-  font-size: 0.85rem; /* Compact button label */
-  font-weight: 900; /* Heavy weight */
-  text-transform: uppercase; /* Uppercase */
-  letter-spacing: 0.05em; /* Tracking */
-}
-
-/* Cancel button styling */
-.modal-btn.cancel {
-  background: #ffffff; /* White fill */
-  border: 2px solid var(--ink); /* Dark outline */
-  color: var(--ink); /* Dark text */
-}
-
-/* Purple confirm button for advancing round */
-.modal-btn.confirm-purple {
-  background: var(--primary); /* Purple fill */
-  color: #ffffff; /* White text */
-}
-
-/* Coral confirm button for erasing game */
-.modal-btn.confirm-danger {
-  background: var(--danger); /* Coral fill */
-  color: #ffffff; /* White text */
-}
-
-/* Guide page text styling in crisp black/ink */
-.guide-page,
-.guide-page .screen-title,
-.guide-page .screen-subtitle,
-.guide-page .guide-tap-hint,
-.guide-page .card-row-title,
-.guide-page .row-chevron,
-.guide-page .back-link-btn,
-.guide-page .detail-card-title,
-.guide-page .detail-label,
-.guide-page .detail-effect,
-.guide-page .detail-definition,
-.guide-page .detail-example {
-  color: var(--ink); /* Force black/ink text across card guide */
-}
-
-/* Guide home return link bar */
-.guide-home-link {
-  display: inline-flex; /* Align icon/arrow and label */
-  align-items: center; /* Vertically center */
-  gap: 6px; /* Small gap */
-  font-size: 0.88rem; /* Readable link size */
-  font-weight: 800; /* Bold link */
-  color: var(--ink); /* Black/ink text */
-  margin-bottom: 10px; /* Space above main title */
-}
-
-/* Guide intro prompt text */
-.guide-tap-hint {
-  color: var(--ink); /* Black/ink hint text */
-  font-size: 0.92rem; /* Readable size */
-  font-weight: 600; /* Medium-bold */
-  margin-bottom: 18px; /* Space before first floor group */
-}
-
-/* Section wrapper for each funnel stage in the guide list */
-.floor-group {
-  margin-bottom: 22px; /* Space between funnel stages */
-}
-
-/* Colored pill header for each funnel stage */
-.floor-header-pill {
-  display: inline-block; /* Pill sizing to text */
-  padding: 7px 18px; /* Pill padding */
-  border-radius: var(--radius-pill); /* Pill shape */
-  font-size: 0.8rem; /* Uppercase badge size */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.08em; /* Tracking */
-  text-transform: uppercase; /* Uppercase */
-  margin-bottom: 12px; /* Space before cards list */
-}
-
-/* Stack of compact card rows inside a floor */
-.floor-cards-stack {
-  display: flex; /* Vertical stack */
-  flex-direction: column; /* Column layout */
-  gap: 10px; /* Gap between card list rows */
-}
-
-/* Clickable card row in the Card Guide list */
 .card-row-btn {
-  position: relative; /* Positioning context for left colored bar */
-  width: 100%; /* Full width */
-  display: flex; /* Title left, optional L2 pill + coin + chevron right */
-  align-items: center; /* Vertically center */
-  justify-content: space-between; /* Spread left and right groups */
-  gap: 10px; /* Gap between groups */
-  background: var(--surface); /* White row card */
-  border: 2px solid var(--line); /* Soft border */
-  border-radius: 16px; /* Rounded row */
-  padding: 15px 16px 15px 22px; /* Extra left padding for colored bar */
-  text-align: left; /* Left-align card name */
-  overflow: hidden; /* Clip left colored bar cleanly */
-  transition: transform 0.12s ease, border-color 0.12s ease; /* Smooth feedback */
+  width: 100%;
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 13px 16px 13px 22px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
 }
 
-/* Left colored strip on each card row matching the funnel stage */
 .card-row-btn::before {
-  content: ""; /* Required for pseudo-element */
-  position: absolute; /* Pin to left side */
-  left: 0; /* Flush left */
-  top: 0; /* Flush top */
-  bottom: 0; /* Flush bottom */
-  width: 9px; /* Stripe width */
-  background: var(--row-floor-color, var(--primary)); /* Stage color passed via inline CSS var */
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 8px;
+  background: var(--accent, var(--pink));
 }
 
-/* Hover feedback on guide list row */
-.card-row-btn:hover {
-  border-color: var(--primary); /* Purple border on hover */
+.row-right { display: flex; align-items: center; gap: 8px; }
+
+.tag-pill {
+  background: var(--ink);
+  color: var(--white);
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.72rem;
 }
 
-/* Press state on guide list row */
-.card-row-btn:active {
-  transform: scale(0.99); /* Subtle press */
+.tag-pill.is-special {
+  background: var(--violet);
 }
 
-/* Card name inside list row */
-.card-row-title {
-  font-size: 1rem; /* Card title size */
-  font-weight: 900; /* Heavy weight */
-  text-transform: uppercase; /* Uppercase matching mockup */
-  letter-spacing: 0.01em; /* Slight tracking */
+.coin-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--pink);
+  box-shadow: 0 0 0 1.5px var(--ink);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.9rem;
+  color: var(--ink);
 }
 
-/* Right cluster inside card row (L2 badge, gold cost circle, chevron) */
-.card-row-meta {
-  display: inline-flex; /* Horizontal cluster */
-  align-items: center; /* Vertically center */
-  gap: 10px; /* Spacing between elements */
-  flex-shrink: 0; /* Prevent squishing */
+.coin-circle.is-lg {
+  width: 52px;
+  height: 52px;
+  border-width: 5px;
+  box-shadow: 0 0 0 2px var(--ink);
+  font-size: 1.45rem;
+  flex-shrink: 0;
 }
 
-/* Small "L2" pill inside guide list row */
-.l2-mini-pill {
-  background: var(--level2-bg); /* Deep violet fill */
-  color: #ffffff; /* White text */
-  font-size: 0.72rem; /* Compact pill font */
-  font-weight: 900; /* Heavy weight */
-  padding: 3px 9px; /* Pill padding */
-  border-radius: var(--radius-pill); /* Pill shape */
-  letter-spacing: 0.05em; /* Tracking */
+.chev { opacity: 0.45; font-size: 1.2rem; }
+
+.detail-top { display: flex; flex-direction: column; gap: 14px; }
+
+.back-link {
+  align-self: flex-start;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 4px 0;
 }
 
-/* Gold coin circle showing card cost in the list row */
-.coin-cost-circle {
-  width: 28px; /* Coin diameter */
-  height: 28px; /* Coin diameter */
-  border-radius: 50%; /* Circle */
-  background: var(--gold); /* Gold fill */
-  border: 2px solid var(--gold-border); /* Gold rim */
-  color: var(--ink); /* Dark cost digit */
-  font-size: 0.85rem; /* Cost number size */
-  font-weight: 900; /* Bold number */
-  display: grid; /* Center digit */
-  place-items: center; /* Center both axes */
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.45); /* Inner shine */
+.detail-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* Right chevron arrow in card row */
-.row-chevron {
-  color: var(--ink); /* Black/ink arrow */
-  font-size: 1.1rem; /* Arrow size */
-  font-weight: 800; /* Bold arrow */
-  line-height: 1; /* Compact line height */
-}
-
-/* Back link ("< All cards") at top of single card detail view */
-.back-link-btn {
-  display: inline-flex; /* Arrow + label */
-  align-items: center; /* Vertically center */
-  gap: 6px; /* Small space */
-  color: var(--ink); /* Black/ink text */
-  font-size: 0.92rem; /* Readable link size */
-  font-weight: 700; /* Semi-bold/bold */
-  margin-bottom: 14px; /* Space below link */
-  padding: 4px 0; /* Touch area */
-}
-
-/* Detail card container */
 .detail-card {
-  position: relative; /* Positioning context for top colored strip */
-  background: var(--surface); /* White card */
-  border: 2px solid var(--line); /* Soft border */
-  border-radius: var(--radius-lg); /* Rounded card */
-  padding: 22px 20px 24px; /* Generous inner padding */
-  margin-top: 10px; /* Space below stage pill */
-  margin-bottom: 22px; /* Space before Next Card button */
-  overflow: hidden; /* Clip top colored strip cleanly */
-  box-shadow: 0 12px 28px rgba(20, 13, 59, 0.06); /* Soft elevation */
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 26px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Top colored band along top edge of detail card */
-.detail-card::before {
-  content: ""; /* Required for pseudo-element */
-  position: absolute; /* Pin to top */
-  left: 0; /* Left edge */
-  right: 0; /* Right edge */
-  top: 0; /* Top edge */
-  height: 12px; /* Band height */
-  background: var(--detail-floor-color, var(--primary)); /* Stage color */
+.detail-stripe { height: 16px; background: var(--accent, var(--pink)); }
+
+.detail-body {
+  padding: 24px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Top header inside detail card (title + large gold coin) */
-.detail-card-head {
-  display: flex; /* Title left, large coin right */
-  align-items: flex-start; /* Align top */
-  justify-content: space-between; /* Spread title and coin */
-  gap: 14px; /* Gap */
-  margin-top: 6px; /* Below top band */
-  margin-bottom: 18px; /* Space before first section */
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* Large uppercase italic card title in detail view */
-.detail-card-title {
-  font-size: 1.85rem; /* Prominent card name */
-  font-weight: 900; /* Extra bold */
-  font-style: italic; /* Italic display */
-  text-transform: uppercase; /* Uppercase */
-  line-height: 1.05; /* Tight line height */
-  margin: 0; /* Remove default margin */
+.detail-title {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 2rem;
+  line-height: 1.15;
 }
 
-/* Large gold coin displaying card cost on detail card */
-.detail-coin {
-  width: 58px; /* Large coin width */
-  height: 58px; /* Large coin height */
-  border-radius: 50%; /* Circle */
-  background: var(--gold); /* Gold fill */
-  border: 3px solid var(--gold-border); /* Gold rim */
-  color: var(--ink); /* Dark cost text */
-  font-size: 1.5rem; /* Large cost digit */
-  font-weight: 900; /* Extra bold */
-  display: grid; /* Center digit */
-  place-items: center; /* Center both axes */
-  flex-shrink: 0; /* Keep circular */
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.45); /* Inner coin detail */
+.detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1.5px solid #E5E7EB;
 }
 
-/* Section block inside detail card (EFFECT, WHAT IS IT?, EXAMPLE) */
-.detail-section {
-  padding-top: 14px; /* Space above text */
-  margin-top: 14px; /* Space below divider */
-  border-top: 1px solid var(--line); /* Divider line between sections */
+.detail-label { font-weight: 700; font-size: 0.95rem; }
+.detail-text { margin: 0; font-size: 1rem; line-height: 1.4; }
+.detail-text.is-muted { opacity: 0.72; }
+
+/* Modales */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 16, 64, 0.82);
+  display: grid;
+  place-items: center;
+  padding: 20px;
 }
 
-/* First section doesn't need top divider */
-.detail-section:first-of-type {
-  border-top: 0; /* No top border */
-  padding-top: 0; /* No top padding */
-  margin-top: 0; /* No top margin */
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--white);
+  color: var(--ink);
+  border-radius: 26px;
+  padding: 26px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
-/* Uppercase section heading inside detail card */
-.detail-label {
-  font-size: 0.75rem; /* Small label */
-  font-weight: 900; /* Heavy weight */
-  letter-spacing: 0.14em; /* Wide tracking */
-  text-transform: uppercase; /* Uppercase */
-  color: var(--ink); /* Black/ink label */
-  margin-bottom: 6px; /* Small gap before body text */
+.modal-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--pink);
+  border: 2px solid var(--ink);
+  display: grid;
+  place-items: center;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.5rem;
 }
 
-/* Effect text inside detail card */
-.detail-effect {
-  font-size: 1.05rem; /* Clear effect text */
-  font-weight: 800; /* Bold weight */
-  margin: 0; /* Clean margin */
+.modal-title { margin: 0; font-family: "Permanent Marker", cursive; font-size: 1.6rem; }
+.modal-desc { margin: 0; font-size: 0.95rem; opacity: 0.8; }
+
+.modal-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
 }
 
-/* Definition text inside detail card */
-.detail-definition {
-  font-size: 0.96rem; /* Comfortable reading size */
-  font-weight: 500; /* Medium weight */
-  margin: 0; /* Clean margin */
+.btn-modal-cancel, .btn-modal-pink {
+  padding: 13px;
+  border-radius: 999px;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.95rem;
 }
 
-/* Example text inside detail card */
-.detail-example {
-  font-size: 0.92rem; /* Slightly softer size */
-  color: var(--ink); /* Black/ink example text */
-  margin: 0; /* Clean margin */
+.btn-modal-cancel {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  color: var(--ink);
 }
 
-/* Phone-sized screens: keep header logo at 56px */
-@media (max-width: 480px) {
-  .brand-logo-only img {
-    height: 56px; /* Prominent mobile header logo height */
-  }
+.btn-modal-pink {
+  background: var(--pink);
+  border: 2px solid var(--ink);
+  color: var(--ink);
 }

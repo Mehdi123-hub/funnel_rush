@@ -1,195 +1,158 @@
 <!doctype html>
-<!-- Declare HTML5 document -->
 <html lang="en">
-<!-- Set document language to English -->
 <head>
-  <!-- UTF-8 character encoding -->
   <meta charset="utf-8">
-  <!-- Mobile viewport configuration including safe-area support -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <!-- Browser theme color matching lavender background -->
-  <meta name="theme-color" content="#f4f2ff">
-  <!-- Page title -->
-  <title>Funnel Rush</title>
-  <!-- Main stylesheet -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slowly But Surely</title>
+  <!-- Typographies Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Kalam:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
-  <!-- Main application module script -->
   <script type="module" src="./js/app.js"></script>
 </head>
 <body>
-  <!-- Centered mobile-first app container -->
-  <main class="app-shell">
-    <!-- 1. HOME SCREEN -->
-    <section id="screen-home" class="home-screen">
+  <main class="shell">
+    <!-- Écran d'accueil : logo, choix du niveau (1 en bleu par défaut) et boutons -->
+    <section id="screen-home" class="screen">
+      <div class="home-hero">
+        <img src="./assets/logo.svg" alt="slowly but surely" class="logo-svg logo-hero">
+        <p class="hero-lead">Turn strangers into loyal customers.</p>
+        <p class="hero-sub">A conversion funnel board game · 2 to 4 players</p>
+      </div>
+
       <div>
-        <!-- Brand logo (already includes Funnel Rush text) -->
-        <img class="hero-logo" src="./FunnelRush_Logo.png" alt="Funnel Rush">
-        <!-- Game tagline -->
-        <h1 class="hero-title">Turn strangers into loyal customers.</h1>
-        <!-- Format and player count note -->
-        <p class="hero-subtitle">A conversion funnel board game · 2 to 4 players</p>
-
-        <!-- Level selector prompt -->
-        <p class="level-picker-label">Choose level</p>
-        <!-- Two-option level radio group -->
-        <div class="level-grid" role="radiogroup" aria-label="Choose level">
-          <!-- Level 1 card -->
-          <button type="button" class="level-card" data-level="1" aria-pressed="false">
-            <div class="level-card-top">
-              <span class="level-num">1</span>
+        <span class="section-label">Choose level</span>
+        <div class="level-grid">
+          <button type="button" class="lvl-card is-sel-1" data-level="1">
+            <div class="lvl-top">
+              <span class="lvl-num">1</span>
               <span class="radio-dot"></span>
             </div>
-            <div class="level-card-title">Level 1</div>
-            <p class="level-card-desc">Discovery · 20<br><span class="coin-line">coins</span></p>
+            <div class="lvl-name">LEVEL 1</div>
+            <div class="lvl-desc">Discovery · 20 coins</div>
           </button>
-
-          <!-- Level 2 card (selected by default) -->
-          <button type="button" class="level-card level-2-card is-selected" data-level="2" aria-pressed="true">
-            <div class="level-card-top">
-              <span class="level-num">2</span>
+          <button type="button" class="lvl-card" data-level="2">
+            <div class="lvl-top">
+              <span class="lvl-num">2</span>
               <span class="radio-dot"></span>
             </div>
-            <div class="level-card-title">Level 2</div>
-            <p class="level-card-desc">Expert · 15<br><span class="coin-line">coins · missions</span></p>
+            <div class="lvl-name">LEVEL 2</div>
+            <div class="lvl-desc">Expert · 15 coins · secret missions</div>
           </button>
         </div>
       </div>
 
-      <div>
-        <!-- Button advancing to player setup -->
-        <button id="btn-new-game" type="button" class="cta-btn">New game</button>
-        <!-- Bottom CARDS button opening the Card Guide -->
-        <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+      <div class="cta-stack">
+        <button id="btn-new-game" type="button" class="btn-main">NEW GAME</button>
+        <a href="./guide.html" class="btn-svg-link">
+          <img src="./assets/button_cards.svg" alt="Cards" class="btn-svg-img">
+        </a>
       </div>
     </section>
 
-    <!-- 2. PLAYERS SCREEN -->
-    <section id="screen-players" class="hidden">
-      <!-- Top header with logo only and active level badge -->
+    <!-- Écran configuration des joueurs (logo cliquable pour revenir à l'accueil) -->
+    <section id="screen-players" class="screen hidden">
       <header class="top-bar">
-        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
-        <span id="players-level-badge" class="level-badge is-level-2">Level 2</span>
+        <button id="btn-players-home" type="button" class="logo-btn" aria-label="Back to home">
+          <img src="./assets/logo.svg" alt="slowly but surely" class="logo-svg">
+        </button>
+        <span id="players-level-badge" class="lvl-pill">LEVEL 1</span>
       </header>
-
-      <!-- Screen heading and prompt -->
-      <h1 class="screen-title">Players</h1>
-      <p class="screen-subtitle">How many players are at the table?</p>
-
-      <!-- Player count selector (2, 3, or 4) -->
-      <div class="count-switcher" role="group" aria-label="Number of players">
+      <div class="page-head">
+        <h1 class="page-title">Players</h1>
+        <p class="page-sub">How many players are at the table?</p>
+      </div>
+      <div class="count-grid">
         <button type="button" class="count-btn" data-count="2">2</button>
         <button type="button" class="count-btn is-active" data-count="3">3</button>
         <button type="button" class="count-btn" data-count="4">4</button>
       </div>
-
-      <!-- Reminder about names and token colors -->
-      <p class="screen-subtitle">Just first names. Each player keeps their token color.</p>
-
-      <!-- Dynamic container for player name inputs -->
-      <div id="player-inputs" class="player-inputs"></div>
-      <!-- Validation error message if needed -->
-      <p id="players-error" class="error-text hidden"></p>
-
-      <!-- Start round 1 button -->
-      <button id="btn-start-game" type="button" class="cta-btn">Start game</button>
-      <!-- Bottom CARDS button below player names and start button -->
-      <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+      <p class="hint-line">Just first names. Each player keeps their token colour.</p>
+      <div id="player-inputs" class="stack"></div>
+      <p id="players-error" class="err-msg hidden"></p>
+      <div class="cta-stack">
+        <button id="btn-start-game" type="button" class="btn-main">START GAME</button>
+        <a href="./guide.html" class="btn-svg-link">
+          <img src="./assets/button_cards.svg" alt="Cards" class="btn-svg-img">
+        </a>
+      </div>
     </section>
 
-    <!-- 3. ROUND SCREEN -->
-    <section id="screen-round" class="hidden">
-      <!-- Top header with logo only and level badge -->
+    <!-- Écran de manche (6 manches) -->
+    <section id="screen-round" class="screen hidden">
       <header class="top-bar">
-        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
-        <span id="round-level-badge" class="level-badge is-level-2">Level 2</span>
+        <img src="./assets/logo.svg" alt="slowly but surely" class="logo-svg">
+        <span id="round-level-badge" class="lvl-pill">LEVEL 1</span>
       </header>
-
-      <!-- Round counter and 6-bar progress indicator -->
-      <div class="round-hero">
-        <p id="round-eyebrow" class="eyebrow">Round</p>
-        <div id="round-counter" class="round-counter">1/6</div>
+      <div class="round-box">
+        <div id="round-eyebrow" class="round-label">ROUND</div>
+        <div id="round-counter" class="round-big">1/6</div>
         <div id="round-bars" class="round-bars"></div>
       </div>
-
-      <!-- Placeholder or drawn event card -->
-      <div id="event-slot"></div>
-
-      <!-- Single contextual round action button -->
-      <button id="btn-round-action" type="button" class="cta-btn">Round 1: draw event</button>
-      <!-- Bottom CARDS button below the round event and primary action -->
-      <a href="./guide.html" class="cards-pill-btn"><span class="cards-icon" aria-hidden="true"></span><span>CARDS</span></a>
+      <div id="event-slot" class="event-wrap"></div>
+      <div class="cta-stack">
+        <button id="btn-round-action" type="button" class="btn-main">ROUND 1: DRAW EVENT</button>
+        <a href="./guide.html" class="btn-svg-link">
+          <img src="./assets/button_cards.svg" alt="Cards" class="btn-svg-img">
+        </a>
+      </div>
     </section>
 
-    <!-- 4. FINAL SCORES SCREEN -->
-    <section id="screen-scores" class="hidden">
-      <!-- Top header with logo only and level badge -->
+    <!-- Écran de saisie des scores finaux (en pions + pièces) -->
+    <section id="screen-scores" class="screen hidden">
       <header class="top-bar">
-        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
-        <span id="scores-level-badge" class="level-badge is-level-2">Level 2</span>
+        <img src="./assets/logo.svg" alt="slowly but surely" class="logo-svg">
+        <span id="scores-level-badge" class="lvl-pill">LEVEL 1</span>
       </header>
-
-      <!-- Screen title and instructions -->
-      <h1 class="screen-title">Final scores</h1>
-      <p id="scores-subtitle" class="screen-subtitle">Count your tokens on the board, enter the numbers, then check completed missions.</p>
-
-      <!-- Score entry form -->
-      <form id="scores-form" novalidate>
-        <!-- Container where player score cards are rendered -->
-        <div id="score-cards"></div>
-        <!-- Submit button to calculate final points -->
-        <button id="btn-calc-scores" type="submit" class="cta-btn is-gold">Calculate</button>
+      <div class="page-head">
+        <h1 class="page-title">Final scores</h1>
+        <p id="scores-subtitle" class="page-sub">Count your pawns and coins on the board.</p>
+      </div>
+      <form id="scores-form" class="score-form" novalidate>
+        <div id="score-cards" class="stack"></div>
+        <button type="submit" class="btn-main">CALCULATE</button>
       </form>
     </section>
 
-    <!-- 5. RESULTS SCREEN -->
-    <section id="screen-results" class="hidden">
-      <!-- Top header with logo only and level badge -->
+    <!-- Écran des résultats -->
+    <section id="screen-results" class="screen hidden">
       <header class="top-bar">
-        <span class="brand-logo-only"><img src="./FunnelRush_Logo.png" alt="Funnel Rush"></span>
-        <span id="results-level-badge" class="level-badge is-level-2">Level 2</span>
+        <img src="./assets/logo.svg" alt="slowly but surely" class="logo-svg">
+        <span id="results-level-badge" class="lvl-pill">LEVEL 1</span>
       </header>
-
-      <!-- Results heading -->
-      <h1 class="screen-title">Results</h1>
-
-      <!-- Highlighted winner banner -->
+      <h1 class="page-title">Results</h1>
       <div id="winner-banner"></div>
-      <!-- Ranked list of remaining players -->
-      <div id="runners-list"></div>
-
-      <!-- Best conversion rate bonus legend -->
-      <div class="bonus-legend">
-        <span class="mini-coin"></span>
-        <span>Best conversion rate: +3 bonus points.</span>
+      <div id="runners-list" class="stack"></div>
+      <p class="bonus-note"><span class="bonus-dot"></span>Best conversion rate: +3 bonus points.</p>
+      <div class="cta-stack">
+        <button id="btn-results-new-game" type="button" class="btn-outline">NEW GAME</button>
       </div>
-
-      <!-- Button opening the reset confirmation modal -->
-      <button id="btn-results-new-game" type="button" class="cta-btn is-outline">New game</button>
     </section>
   </main>
 
-  <!-- ROUND ADVANCEMENT CONFIRMATION MODAL -->
-  <div id="modal-round" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-round-title">
+  <!-- Modale de confirmation de manche / fin de partie -->
+  <div id="modal-round" class="modal hidden">
     <div class="modal-card">
-      <div class="modal-icon is-purple">?</div>
+      <div class="modal-badge">?</div>
       <h2 id="modal-round-title" class="modal-title">Everyone played?</h2>
       <p id="modal-round-desc" class="modal-desc"></p>
       <div class="modal-actions">
-        <button id="modal-round-cancel" type="button" class="modal-btn cancel">Cancel</button>
-        <button id="modal-round-confirm" type="button" class="modal-btn confirm-purple">Yes</button>
+        <button id="modal-round-cancel" type="button" class="btn-modal-cancel">CANCEL</button>
+        <button id="modal-round-confirm" type="button" class="btn-modal-pink">YES</button>
       </div>
     </div>
   </div>
 
-  <!-- ERASE GAME CONFIRMATION MODAL -->
-  <div id="modal-reset" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-reset-title">
+  <!-- Modale de suppression de partie -->
+  <div id="modal-reset" class="modal hidden">
     <div class="modal-card">
-      <div class="modal-icon is-danger">!</div>
-      <h2 id="modal-reset-title" class="modal-title">Erase game?</h2>
+      <div class="modal-badge">!</div>
+      <h2 class="modal-title">Erase game?</h2>
       <p class="modal-desc">Scores will be deleted from this device.</p>
       <div class="modal-actions">
-        <button id="modal-reset-cancel" type="button" class="modal-btn cancel">Cancel</button>
-        <button id="modal-reset-confirm" type="button" class="modal-btn confirm-danger">Erase</button>
+        <button id="modal-reset-cancel" type="button" class="btn-modal-cancel">CANCEL</button>
+        <button id="modal-reset-confirm" type="button" class="btn-modal-pink">ERASE</button>
       </div>
     </div>
   </div>
