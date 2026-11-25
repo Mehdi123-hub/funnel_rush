@@ -51,31 +51,31 @@ export const CARDS = [
   { id: "bad-buzz", name: "Bad Buzz", floor: "loyalty", cost: 0, level: 1, special: true, effect: "Place in front of an opponent: at the start of their next turn, their most advanced pawn goes back to Awareness (blocked by Customer Reviews).", definition: "A public backlash forcing a brand to win back lost trust from scratch.", example: "Negative social media controversy hurting brand reputation." },
 ];
 
-// 20 événements au total : 14 au niveau 1 + 6 réservés au niveau 2
+// Les 20 événements exacts (14 au niveau 1 + 6 au niveau 2)
 export const EVENTS = [
   // Niveau 1 (14 événements)
-  { id: "algorithm-update", title: "Algorithm Update", floor: "awareness", level: 1, effect: "SEO Article cards don't work this round." },
-  { id: "bad-review", title: "Bad Review", floor: "consideration", level: 1, effect: "Every player loses 1 pawn from Consideration, which goes to Lost. Customer Reviews protects you." },
-  { id: "viral-post", title: "Viral Post", floor: "awareness", level: 1, effect: "The player with the fewest pawns in Awareness brings 1 in from the Market." },
-  { id: "competitor-launch", title: "Competitor Launch", floor: "interest", level: 1, effect: "Every player loses 1 pawn from the floor where they have the most (if it holds at least 2)." },
-  { id: "black-friday", title: "Black Friday", floor: "conversion", level: 1, effect: "Free Trial, Promo Code and A/B Test cost 1 coin less this round." },
-  { id: "website-bug", title: "Website Bug", floor: "conversion", level: 1, effect: "Nobody can play Free Trial, Promo Code, A/B Test or Buzz this round." },
-  { id: "flash-sale", title: "Flash Sale", floor: "conversion", level: 1, effect: "Promo Code moves 1 extra prospect this round, but revenue is halved." },
-  { id: "inbox-overload", title: "Inbox Overload", floor: "interest", level: 1, effect: "Newsletter cards only move 1 prospect this round." },
-  { id: "free-guide-boom", title: "Free Guide Boom", floor: "interest", level: 1, effect: "White Paper costs 1 coin less this round." },
-  { id: "live-qa-buzz", title: "Live Q&A Buzz", floor: "consideration", level: 1, effect: "Webinar moves 1 extra prospect if you have at least 1 pawn in Interest." },
-  { id: "cart-abandonment", title: "Cart Abandonment", floor: "consideration", level: 1, effect: "Retargeting costs 1 coin less this round." },
-  { id: "word-of-mouth", title: "Word of Mouth", floor: "loyalty", level: 1, effect: "Referral Program adds 1 extra prospect to Awareness." },
-  { id: "summer-slowdown", title: "Summer Slowdown", floor: "awareness", level: 1, effect: "Instagram Ad costs 1 coin more this round." },
-  { id: "happy-hour-promo", title: "Happy Hour Promo", floor: "conversion", level: 1, effect: "Each player with a pawn in Conversion gets +2 coins immediately." },
+  { id: "algorithm-update", title: "Algorithm Update", floor: "awareness", level: 1, effect: "SEO Article cards don't work this round.", flavor: "Search engines change their rules often." },
+  { id: "bad-review", title: "Bad Review", floor: "consideration", level: 1, effect: "Every player loses 1 pawn from Consideration, which goes to Lost. Customer Reviews protects you.", flavor: "One bad review can scare buyers away." },
+  { id: "viral-post", title: "Viral Post", floor: "awareness", level: 1, effect: "The player with the fewest pawns in Awareness brings 1 in from the Market (tie: all tied players).", flavor: "Sometimes a post explodes. Luck helps!" },
+  { id: "competitor-launch", title: "Competitor Launch", floor: "interest", level: 1, effect: "Every player loses 1 pawn from the funnel floor where they have the most (if it holds at least 2): it goes to Lost.", flavor: "Competition steals attention at every step." },
+  { id: "black-friday", title: "Black Friday", floor: "conversion", level: 1, effect: "Free Trial, Promo Code and A/B Test cost 1 coin less this round.", flavor: "Big sales periods make people buy faster." },
+  { id: "website-bug", title: "Website Bug", floor: "conversion", level: 1, effect: "Nobody can play Free Trial, Promo Code, A/B Test or Buzz this round.", flavor: "No working website, no sales." },
+  { id: "trade-show", title: "Trade Show", floor: "awareness", level: 1, effect: "Each player may bring 1 pawn from the Market into Awareness for free.", flavor: "A well-placed stand brings new contacts." },
+  { id: "tiktok-trend", title: "TikTok Trend", floor: "awareness", level: 1, effect: "Instagram Ad and Influencer Partnership cost 1 coin less this round.", flavor: "Short videos make visibility explode." },
+  { id: "spam-filter", title: "Spam Filter", floor: "interest", level: 1, effect: "Newsletter and Lead Magnet cards don't work this round.", flavor: "A badly targeted email ends up in the spam folder." },
+  { id: "word-of-mouth", title: "Word of Mouth", floor: "loyalty", level: 1, effect: "Each player with at least 1 pawn in Loyalty brings 1 pawn from the Market into Awareness.", flavor: "Loyal customers are the best ambassadors." },
+  { id: "funding-round", title: "Funding Round", floor: "conversion", level: 1, effect: "Each player receives 3 coins from the bank.", flavor: "An investor believes in you: the budget grows." },
+  { id: "rising-costs", title: "Rising Costs", floor: "consideration", level: 1, effect: "Every Action card costs 1 more coin this round.", flavor: "When everything costs more, choose your actions." },
+  { id: "press-article", title: "Press Article", floor: "conversion", level: 1, effect: "The player with the fewest pawns in Conversion moves 1 pawn from Consideration to Conversion (tie: all tied players).", flavor: "A good article can win over undecided buyers." },
+  { id: "quiet-day", title: "Quiet Day", floor: "interest", level: 1, effect: "Nothing special happens this round.", flavor: "Use it to plan your next moves." },
 
-  // Niveau 2 uniquement (6 événements supplémentaires)
-  { id: "ad-price-increase", title: "Ad Price Increase", floor: "awareness", level: 2, effect: "Instagram Ad and Influencer Partnership cost 2 more coins." },
-  { id: "gdpr-audit", title: "GDPR Audit", floor: "interest", level: 2, effect: "Every player pays 2 coins to the bank to become compliant." },
-  { id: "economic-crisis", title: "Economic Crisis", floor: "conversion", level: 2, effect: "All revenue is halved (round down)." },
-  { id: "churn-peak", title: "Churn Peak", floor: "loyalty", level: 2, effect: "The churn die makes a pawn leave on 1, 2 or 3." },
-  { id: "strict-ad-review", title: "Strict Ad Review", floor: "awareness", level: 2, effect: "Influencer Partnership is blocked this round." },
-  { id: "support-backlog", title: "Support Backlog", floor: "loyalty", level: 2, effect: "Customer Support costs 1 extra coin this round." },
+  // Niveau 2 (6 événements supplémentaires)
+  { id: "ad-price-increase", title: "Ad Price Increase", floor: "awareness", level: 2, effect: "Instagram Ad and Influencer Partnership cost 2 more coins.", flavor: "Platforms keep raising their prices." },
+  { id: "gdpr-audit", title: "GDPR Audit", floor: "interest", level: 2, effect: "Every player pays 2 coins to the bank to become compliant.", flavor: "Personal data must be protected." },
+  { id: "economic-crisis", title: "Economic Crisis", floor: "conversion", level: 2, effect: "All revenue is halved (round down).", flavor: "When the economy slows, customers spend less." },
+  { id: "churn-peak", title: "Churn Peak", floor: "loyalty", level: 2, effect: "The churn die makes a pawn leave on 1, 2 or 3.", flavor: "A bad quarter can drive customers away." },
+  { id: "data-breach", title: "Data Breach", floor: "loyalty", level: 2, effect: "Each player moves 1 pawn from Loyalty back to Conversion.", flavor: "A security flaw destroys trust." },
+  { id: "ad-account-suspended", title: "Ad Account Suspended", floor: "awareness", level: 2, effect: "Nobody can play Instagram Ad, SEO Article or Influencer Partnership this round.", flavor: "Break a rule and the platform cuts everything." },
 ];
 
 // Calcule les points selon les règles :

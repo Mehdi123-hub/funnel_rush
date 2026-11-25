@@ -121,7 +121,7 @@ function render() {
     } else {
       const ev = EVENTS.find((e) => e.id === state.currentEventId) || EVENTS[0];
       const floor = FUNNEL_FLOORS[ev.floor] || { label: ev.floor, color: "#FF5FC8" };
-      $("event-slot").innerHTML = `<div class="event-card"><div class="event-head" style="background:${floor.color}"><span>Event · ${floor.label}</span><span class="excl-badge">!</span></div><div class="event-body"><h2 class="event-name">${ev.title}</h2><p class="detail-label" style="opacity:1">${ev.effect}</p><p class="event-tip">Apply this effect during Round ${state.round}, then advance when everyone has played.</p></div></div>`;
+      $("event-slot").innerHTML = `<div class="event-card"><div class="event-head" style="background:${floor.color}"><span>Event · ${floor.label}</span><span class="excl-badge">!</span></div><div class="event-body"><h2 class="event-name">${ev.title}</h2><p class="detail-label" style="opacity:1">${ev.effect}</p><p class="event-tip"><em>${ev.flavor}</em></p></div></div>`;
       $("btn-round-action").textContent = state.round === TOTAL_ROUNDS ? "FINISH GAME & ENTER SCORES" : `NEXT ROUND (${state.round + 1}/${TOTAL_ROUNDS})`;
     }
   }
