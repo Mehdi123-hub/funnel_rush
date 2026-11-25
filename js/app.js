@@ -8,7 +8,7 @@ const $ = (id) => document.getElementById(id);
 // État initial d'un joueur pour la saisie finale
 const emptyScore = (coins = "") => ({ loyalty: "", conversion: "", coins, market: "", buzz: "0", mission: false });
 
-// État par défaut avec le niveau 1 sélectionné
+// État par défaut avec le niveau 1 sélectionné et historique des événements déjà tirés
 const defaultState = () => ({
   screen: "home",
   level: 1,
@@ -16,7 +16,7 @@ const defaultState = () => ({
   playerNames: ["", "", "", ""],
   round: 1,
   eventDrawn: false,
-  lastEventId: null,
+  usedEventIds: [],
   currentEventId: null,
   scores: Array.from({ length: 4 }, () => emptyScore()),
 });
@@ -37,6 +37,7 @@ function load() {
       playerCount: [2, 3, 4].includes(raw.playerCount) ? raw.playerCount : 3,
       playerNames: [0, 1, 2, 3].map((i) => String(raw.playerNames?.[i] ?? "")),
       round: Math.min(TOTAL_ROUNDS, Math.max(1, Number(raw.round) || 1)),
+      usedEventIds: Array.isArray(raw.usedEventIds) ? raw.usedEventIds : [],
       scores: [0, 1, 2, 3].map((i) => ({ ...base.scores[i], ...(raw.scores?.[i] || {}) })),
     };
   } catch {
@@ -57,6 +58,20 @@ function go(screen) {
   state.screen = screen;
   save();
   render();
+}
+
+// Tire un événement selon le niveau sans répéter ceux déjà sortis dans cette partie
+function drawUniqueEvent() {
+  const allowed = EVENTS.filter((e) => e.level <= state.level);
+  const unused = allowed.filter((e) => !state.usedEventIds.includes(e.id));
+  const pool = unused.length ? unused : allowed;
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+
+  state.currentEventId = chosen.id;
+  state.eventDrawn = true;
+  if (!state.usedEventIds.includes(chosen.id)) {
+    state.usedEventIds.push(chosen.id);
+  }
 }
 
 // Affiche l'écran actif et met à jour son contenu
@@ -205,7 +220,7 @@ document.querySelectorAll(".count-btn").forEach((b) => b.addEventListener("click
   render();
 }));
 
-// Valide les noms et lance la manche 1
+// Valide les noms, réinitialise l'historique des événements et lance la manche 1
 $("btn-start-game").addEventListener("click", () => {
   const names = [...$("player-inputs").querySelectorAll("input")].map((i) => i.value.trim());
   if (names.some((n) => !n)) {
@@ -216,19 +231,15 @@ $("btn-start-game").addEventListener("click", () => {
   names.forEach((n, i) => (state.playerNames[i] = n));
   state.round = 1;
   state.eventDrawn = false;
-  state.lastEventId = null;
+  state.usedEventIds = [];
   state.currentEventId = null;
   go("round");
 });
 
-// Tire un événement filtré par niveau (sans répéter le précédent) ou change de manche
+// Tire un événement unique pour la manche ou passe à la manche suivante / aux scores
 $("btn-round-action").addEventListener("click", () => {
   if (!state.eventDrawn) {
-    const pool = EVENTS.filter((e) => e.level <= state.level && e.id !== state.lastEventId);
-    const chosen = pool[Math.floor(Math.random() * pool.length)];
-    state.lastEventId = chosen.id;
-    state.currentEventId = chosen.id;
-    state.eventDrawn = true;
+    drawUniqueEvent();
     save();
     return render();
   }
@@ -252,11 +263,9 @@ $("scores-form").addEventListener("submit", (e) => {
   for (let i = 0; i < state.playerCount; i++) {
     const sc = state.scores[i];
     const vals = [sc.loyalty, sc.conversion, sc.market, sc.buzz, sc.coins];
-    const nums = vals.map(Number);
-    const [loyalty, conversion, market, buzz, coins] = nums;
+    const [loyalty, conversion, market, buzz, coins] = vals.map(Number);
     const err = $("score-cards").children[i]?.querySelector("[data-err]");
 
-    // Vérifie entiers positifs, bornes Market (0..6), Buzz (0..2) et total cohérent
     const badNumber = vals.some((v) => v === "" || Number.isNaN(Number(v)) || Number(v) < 0 || !Number.isInteger(Number(v)));
     const badRange = market > PAWNS_PER_PLAYER || buzz > 2 || loyalty + conversion > PAWNS_PER_PLAYER + buzz - market || coins < 0;
 
