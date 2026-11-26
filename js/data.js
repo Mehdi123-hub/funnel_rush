@@ -16,7 +16,7 @@ export const PLAYER_COLORS = [
   { name: "Blue", hex: "#2F7BFF" },
 ];
 
-// Les 5 étapes du funnel (du froid vers le chaud)
+// Les 5 étapes du funnel
 export const FLOORS = [
   { id: "awareness", name: "AWARENESS", color: "#A3ACD6" },
   { id: "interest", name: "INTEREST", color: "#739BFF" },
